@@ -1,7 +1,6 @@
 require('dotenv').config();
 const mysql = require('mysql2');
 
-// Cria conexão com o banco Railway
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -11,17 +10,7 @@ const connection = mysql.createConnection({
   ssl: { rejectUnauthorized: false }
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('❌ Erro ao conectar ao MySQL:', err);
-  } else {
-    console.log('✅ Conexão com MySQL (Railway) bem-sucedida!');
-    criarTabelas();
-  }
-});
-
-// 🧱 Cria automaticamente as tabelas se não existirem
-function criarTabelas() {
+function criarTabelas(callback) {
   const tabelas = [
     `CREATE TABLE IF NOT EXISTS barbeiros (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,21 +19,17 @@ function criarTabelas() {
       ativo BOOLEAN DEFAULT true,
       percentual_comissao DECIMAL(5,2) DEFAULT 0.00
     )`,
-
     `CREATE TABLE IF NOT EXISTS servicos (
       id INT AUTO_INCREMENT PRIMARY KEY,
       nome VARCHAR(100) NOT NULL,
       preco_base DECIMAL(10,2) NOT NULL
     )`,
-
     `CREATE TABLE IF NOT EXISTS despesas (
       id INT AUTO_INCREMENT PRIMARY KEY,
       descricao VARCHAR(100) NOT NULL,
       valor DECIMAL(10,2) NOT NULL,
       data DATE DEFAULT (CURRENT_DATE)
     )`,
-
-    // ✅ Tabela de vendas corrigida
     `CREATE TABLE IF NOT EXISTS vendas (
       id INT AUTO_INCREMENT PRIMARY KEY,
       barbeiro_id INT,
@@ -58,12 +43,25 @@ function criarTabelas() {
     )`
   ];
 
+  let pendentes = tabelas.length;
   tabelas.forEach((sql) => {
     connection.query(sql, (err) => {
-      if (err) console.error('❌ Erro ao criar tabela:', err);
+      if (err) console.error('❌ Erro ao criar tabela:', err.sqlMessage);
       else console.log('✅ Tabela verificada/criada com sucesso.');
+      if (--pendentes === 0 && callback) callback();
     });
   });
 }
+
+connection.connect((err) => {
+  if (err) {
+    console.error('❌ Erro ao conectar ao MySQL:', err.sqlMessage);
+  } else {
+    console.log('✅ Conectado ao MySQL (Railway)');
+    criarTabelas(() => {
+      console.log('🚀 Todas as tabelas foram criadas/verificadas.');
+    });
+  }
+});
 
 module.exports = connection;
