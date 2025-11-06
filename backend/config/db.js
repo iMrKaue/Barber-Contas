@@ -27,8 +27,9 @@ function criarTabelas(callback) {
     `CREATE TABLE IF NOT EXISTS despesas (
       id INT AUTO_INCREMENT PRIMARY KEY,
       descricao VARCHAR(100) NOT NULL,
+      categoria VARCHAR(50),
       valor DECIMAL(10,2) NOT NULL,
-      data DATE DEFAULT (CURRENT_DATE)
+      data_despesa DATE DEFAULT (CURRENT_DATE)
     )`,
     `CREATE TABLE IF NOT EXISTS vendas (
       id INT AUTO_INCREMENT PRIMARY KEY,
