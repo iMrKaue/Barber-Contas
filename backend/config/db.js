@@ -68,9 +68,38 @@ function criarTabelas(callback) {
 // ⚙️ Corrige automaticamente as foreign keys da tabela vendas
 function corrigirForeignKeys() {
   console.log('🔍 Verificando e corrigindo foreign keys de vendas...');
-  const corrigirFKs = `
-    ALTER TABLE vendas DROP FOREIGN KEY IF EXISTS vendas_ibfk_1;
-    ALTER TABLE vendas DROP FOREIGN KEY IF EXISTS vendas_ibfk_2;
+
+  // 1️⃣ Primeiro, busca os nomes das FKs atuais
+  const listarFKs = `
+    SELECT CONSTRAINT_NAME 
+    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_NAME = 'vendas' AND CONSTRAINT_SCHEMA = DATABASE()
+      AND REFERENCED_TABLE_NAME IS NOT NULL;
+  `;
+
+  connection.query(listarFKs, (err, results) => {
+    if (err) return console.error('Erro ao listar FKs:', err.sqlMessage);
+
+    // 2️⃣ Remove todas as FKs encontradas
+    const drops = results.map(r => `ALTER TABLE vendas DROP FOREIGN KEY \`${r.CONSTRAINT_NAME}\`;`).join(' ');
+    if (drops) {
+      connection.query(drops, (err2) => {
+        if (err2) console.error('Erro ao remover FKs antigas:', err2.sqlMessage);
+        else {
+          console.log('🗑️ Foreign keys antigas removidas.');
+          adicionarNovasFKs();
+        }
+      });
+    } else {
+      console.log('ℹ️ Nenhuma FK antiga encontrada, criando novas.');
+      adicionarNovasFKs();
+    }
+  });
+}
+
+// 3️⃣ Recria as FKs com ON DELETE CASCADE
+function adicionarNovasFKs() {
+  const addFKs = `
     ALTER TABLE vendas
       ADD CONSTRAINT fk_vendas_barbeiros
         FOREIGN KEY (barbeiro_id)
@@ -82,10 +111,11 @@ function corrigirForeignKeys() {
         ON DELETE CASCADE;
   `;
 
-  connection.query(corrigirFKs, (err) => {
-    if (err) console.error("⚠️ Erro ao corrigir FKs:", err.sqlMessage);
-    else console.log("✅ Foreign keys corrigidas com ON DELETE CASCADE!");
+  connection.query(addFKs, (err) => {
+    if (err) console.error('⚠️ Erro ao adicionar novas FKs:', err.sqlMessage);
+    else console.log('✅ Foreign keys corrigidas com ON DELETE CASCADE!');
   });
 }
+
 
 module.exports = connection;
