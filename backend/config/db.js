@@ -47,39 +47,53 @@ function recriarTabelaDespesas() {
 
 // 🧩 Cria as outras tabelas se não existirem
 function criarOutrasTabelas() {
-  const tabelas = [
-    `CREATE TABLE IF NOT EXISTS barbeiros (
+  const barbeiros = `
+    CREATE TABLE IF NOT EXISTS barbeiros (
       id INT AUTO_INCREMENT PRIMARY KEY,
       nome VARCHAR(100) NOT NULL,
       email VARCHAR(100),
       ativo BOOLEAN DEFAULT true,
       percentual_comissao DECIMAL(5,2) DEFAULT 0.00
-    )`,
-    `CREATE TABLE IF NOT EXISTS servicos (
+    )
+  `;
+
+  const servicos = `
+    CREATE TABLE IF NOT EXISTS servicos (
       id INT AUTO_INCREMENT PRIMARY KEY,
       nome VARCHAR(100) NOT NULL,
       preco_base DECIMAL(10,2) NOT NULL
-    )`,
-    `CREATE TABLE IF NOT EXISTS vendas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    barbeiro_id INT,
-    servico_id INT,
-    valor_bruto DECIMAL(10,2) NOT NULL,
-    metodo_pagamento VARCHAR(50),
-    comissao DECIMAL(10,2) DEFAULT 0.00,
-    data_venda DATE DEFAULT (CURRENT_DATE),
-    FOREIGN KEY (barbeiro_id) REFERENCES barbeiros(id) ON DELETE CASCADE,
-    FOREIGN KEY (servico_id) REFERENCES servicos(id) ON DELETE CASCADE
-)`
+    )
+  `;
 
-  ];
+  const vendas = `
+    CREATE TABLE IF NOT EXISTS vendas (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      barbeiro_id INT,
+      servico_id INT,
+      valor_bruto DECIMAL(10,2) NOT NULL,
+      metodo_pagamento VARCHAR(50),
+      comissao DECIMAL(10,2) DEFAULT 0.00,
+      data_venda DATE DEFAULT (CURRENT_DATE),
+      FOREIGN KEY (barbeiro_id) REFERENCES barbeiros(id) ON DELETE CASCADE,
+      FOREIGN KEY (servico_id) REFERENCES servicos(id) ON DELETE CASCADE
+    )
+  `;
 
-  tabelas.forEach((sql) => {
-    connection.query(sql, (err) => {
-      if (err) console.error('❌ Erro ao criar tabela:', err.sqlMessage);
-      else console.log('✅ Tabela verificada/criada com sucesso.');
+  connection.query(barbeiros, (err) => {
+    if (err) return console.error('❌ Erro ao criar tabela barbeiros:', err.sqlMessage);
+    console.log('✅ Tabela barbeiros criada/verificada.');
+
+    connection.query(servicos, (err2) => {
+      if (err2) return console.error('❌ Erro ao criar tabela servicos:', err2.sqlMessage);
+      console.log('✅ Tabela servicos criada/verificada.');
+
+      connection.query(vendas, (err3) => {
+        if (err3) return console.error('❌ Erro ao criar tabela vendas:', err3.sqlMessage);
+        console.log('✅ Tabela vendas criada/verificada (com FKs CASCADE).');
+      });
     });
   });
 }
+
 
 module.exports = connection;
