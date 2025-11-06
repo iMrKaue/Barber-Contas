@@ -23,7 +23,6 @@ const Venda = {
   criar: (dados, callback) => {
     const { barbeiro_id, servico_id, valor_bruto, metodo_pagamento } = dados;
 
-    // Buscar percentual do barbeiro
     const sqlComissao = 'SELECT percentual_comissao FROM barbeiros WHERE id = ?';
     db.query(sqlComissao, [barbeiro_id], (err, result) => {
       if (err) return callback(err);
@@ -40,10 +39,10 @@ const Venda = {
     });
   },
 
-  excluir(id, callback) {
-    connection.query('DELETE FROM nome_tabela WHERE id = ?', [id], (err, results) => {
+  excluir: (id, callback) => {
+    db.query('DELETE FROM vendas WHERE id = ?', [id], (err, results) => {
       if (err) {
-        console.error(`Erro SQL ao excluir da tabela nome_tabela:`, err.sqlMessage);
+        console.error('❌ Erro ao excluir venda:', err.sqlMessage);
         return callback(err);
       }
       callback(null, results);
@@ -64,7 +63,7 @@ const Venda = {
       ORDER BY v.data_venda DESC
     `;
     db.query(sql, [barbeiro_id], callback);
-  }
+  },
 };
 
 module.exports = Venda;
