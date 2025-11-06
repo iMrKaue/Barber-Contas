@@ -1,15 +1,14 @@
 require('dotenv').config();
 const mysql = require('mysql2');
 
+// Cria conexão com o banco Railway
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: { rejectUnauthorized: false }
 });
 
 connection.connect((err) => {
@@ -21,6 +20,7 @@ connection.connect((err) => {
   }
 });
 
+// 🧱 Cria automaticamente as tabelas se não existirem
 function criarTabelas() {
   const tabelas = [
     `CREATE TABLE IF NOT EXISTS barbeiros (
@@ -30,23 +30,29 @@ function criarTabelas() {
       ativo BOOLEAN DEFAULT true,
       percentual_comissao DECIMAL(5,2) DEFAULT 0.00
     )`,
+
     `CREATE TABLE IF NOT EXISTS servicos (
       id INT AUTO_INCREMENT PRIMARY KEY,
       nome VARCHAR(100) NOT NULL,
       preco_base DECIMAL(10,2) NOT NULL
     )`,
+
     `CREATE TABLE IF NOT EXISTS despesas (
       id INT AUTO_INCREMENT PRIMARY KEY,
       descricao VARCHAR(100) NOT NULL,
       valor DECIMAL(10,2) NOT NULL,
       data DATE DEFAULT (CURRENT_DATE)
     )`,
+
+    // ✅ Tabela de vendas corrigida
     `CREATE TABLE IF NOT EXISTS vendas (
       id INT AUTO_INCREMENT PRIMARY KEY,
       barbeiro_id INT,
       servico_id INT,
-      valor DECIMAL(10,2) NOT NULL,
-      data DATE DEFAULT (CURRENT_DATE),
+      valor_bruto DECIMAL(10,2) NOT NULL,
+      metodo_pagamento VARCHAR(50),
+      comissao DECIMAL(10,2) DEFAULT 0.00,
+      data_venda DATE DEFAULT (CURRENT_DATE),
       FOREIGN KEY (barbeiro_id) REFERENCES barbeiros(id),
       FOREIGN KEY (servico_id) REFERENCES servicos(id)
     )`
@@ -54,7 +60,7 @@ function criarTabelas() {
 
   tabelas.forEach((sql) => {
     connection.query(sql, (err) => {
-      if (err) console.error('Erro ao criar tabela:', err);
+      if (err) console.error('❌ Erro ao criar tabela:', err);
       else console.log('✅ Tabela verificada/criada com sucesso.');
     });
   });
