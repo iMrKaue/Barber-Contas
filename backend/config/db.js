@@ -58,14 +58,6 @@ function criarTabelas() {
     )`
   ];
 
-  // ⚠️ Código temporário para remover tabela antiga e recriar
-connection.query("DROP TABLE IF EXISTS vendas", (err) => {
-  if (err) console.error("Erro ao remover tabela antiga de vendas:", err);
-  else console.log("🗑️ Tabela antiga de vendas removida com sucesso.");
-  criarTabelas();
-});
-
-
   tabelas.forEach((sql) => {
     connection.query(sql, (err) => {
       if (err) console.error('❌ Erro ao criar tabela:', err);
