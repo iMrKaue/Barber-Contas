@@ -5,11 +5,12 @@ const Venda = {
   listarTodas: (callback) => {
     const sql = `
       SELECT v.id, b.nome AS barbeiro, s.nome AS servico,
-             v.valor_bruto, v.metodo_pagamento, v.comissao, v.data_venda
+       v.valor AS valor_bruto, v.metodo_pagamento, v.comissao, v.data AS data_venda
       FROM vendas v
       JOIN barbeiros b ON v.barbeiro_id = b.id
       JOIN servicos s ON v.servico_id = s.id
-      ORDER BY v.data_venda DESC
+    ORDER BY v.data DESC
+    LIMIT 100
     `;
     db.query(sql, callback);
   },
