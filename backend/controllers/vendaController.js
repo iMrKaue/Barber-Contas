@@ -23,10 +23,17 @@ exports.excluir = (req, res) => {
   });
 };
 
-exports.listarPorBarbeiro = (req, res) => {
-  const { barbeiro_id } = req.params;
-  Venda.listarPorBarbeiro(barbeiro_id, (err, results) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(results);
+exports.excluir = (req, res) => {
+  const { id } = req.params;
+  ModelName.excluir(id, (err, results) => {
+    if (err) {
+      console.error(`❌ Erro ao excluir ${ModelName.name}:`, err.sqlMessage || err);
+      return res.status(500).json({
+        message: `Erro ao excluir ${ModelName.name}`,
+        detalhe: err.sqlMessage || 'Erro interno do servidor',
+      });
+    }
+    res.json({ message: `${ModelName.name} excluído com sucesso` });
   });
 };
+

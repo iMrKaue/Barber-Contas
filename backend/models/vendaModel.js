@@ -40,8 +40,14 @@ const Venda = {
     });
   },
 
-  excluir: (id, callback) => {
-    db.query('DELETE FROM vendas WHERE id = ?', [id], callback);
+  excluir(id, callback) {
+    connection.query('DELETE FROM nome_tabela WHERE id = ?', [id], (err, results) => {
+      if (err) {
+        console.error(`Erro SQL ao excluir da tabela nome_tabela:`, err.sqlMessage);
+        return callback(err);
+      }
+      callback(null, results);
+    });
   },
 
   listarPorBarbeiro: (barbeiro_id, callback) => {
@@ -58,7 +64,7 @@ const Venda = {
       ORDER BY v.data_venda DESC
     `;
     db.query(sql, [barbeiro_id], callback);
-  },
+  }
 };
 
 module.exports = Venda;

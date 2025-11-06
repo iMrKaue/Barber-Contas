@@ -27,9 +27,16 @@ const Barbeiro = {
     );
   },
 
-  excluir: (id, callback) => {
-    db.query('DELETE FROM barbeiros WHERE id=?', [id], callback);
-  },
-};
+  excluir(id, callback) {
+    connection.query('DELETE FROM barbeiros WHERE id = ?', [id], (err, results) => {
+      if (err) {
+        console.error('❌ Erro ao excluir barbeiro:', err.sqlMessage);
+        return callback(err);
+      }
+      console.log('✅ Barbeiro excluído:', id);
+      callback(null, results);
+    });
+  }
+}
 
 module.exports = Barbeiro;
