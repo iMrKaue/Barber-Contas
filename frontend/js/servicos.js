@@ -1,5 +1,11 @@
 // frontend/js/servicos.js
-const API_URL = "http://localhost:3000/api/servicos";
+// Detecta se está rodando localmente ou online
+const API_BASE = window.location.hostname.includes("localhost")
+  ? "http://localhost:3000"
+  : "https://barber-contas.onrender.com";
+
+const API_URL = `${API_BASE}/api/servicos`;
+
 
 const form = document.getElementById("formServico");
 const tabela = document.querySelector("#tabelaServicos tbody");

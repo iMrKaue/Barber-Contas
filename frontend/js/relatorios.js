@@ -1,6 +1,11 @@
+// Detecta se está rodando localmente ou online
 console.log("📊 Script relatorios.js carregado!");
 
-const API_RELATORIOS = "http://localhost:3000/api/relatorios/financeiro";
+const API_BASE = window.location.hostname.includes("localhost")
+  ? "http://localhost:3000"
+  : "https://barber-contas.onrender.com";
+const API_RELATORIOS = `${API_BASE}/api/relatorios/financeiro`;
+
 
 async function carregarResumo() {
   try {

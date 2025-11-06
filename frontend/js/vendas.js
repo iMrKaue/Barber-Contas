@@ -1,7 +1,12 @@
 // frontend/js/vendas.js
-const API_VENDAS = "http://localhost:3000/api/vendas";
-const API_BARBEIROS = "http://localhost:3000/api/barbeiros";
-const API_SERVICOS = "http://localhost:3000/api/servicos";
+// Detecta se está rodando localmente ou online
+const API_BASE = window.location.hostname.includes("localhost")
+  ? "http://localhost:3000"
+  : "https://barber-contas.onrender.com";
+const API_VENDAS = `${API_BASE}/api/vendas`;
+const API_BARBEIROS = `${API_BASE}/api/barbeiros`;
+const API_SERVICOS = `${API_BASE}/api/servicos`;
+
 
 const form = document.getElementById("formVenda");
 const tabela = document.querySelector("#tabelaVendas tbody");

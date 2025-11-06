@@ -1,7 +1,11 @@
 // frontend/js/despesas.js
 console.log("💸 Script despesas.js carregado!");
+// Detecta se está rodando localmente ou online
+const API_BASE = window.location.hostname.includes("localhost")
+  ? "http://localhost:3000"
+  : "https://barber-contas.onrender.com";
+const API_DESPESAS = `${API_BASE}/api/despesas`;
 
-const API_DESPESAS = "http://localhost:3000/api/despesas";
 
 const form = document.getElementById("formDespesa");
 const tabela = document.querySelector("#tabelaDespesas tbody");
