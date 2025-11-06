@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatórios Financeiros - Barber Contas</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <!-- Importa o Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <header>
+    <h1>📊 Relatórios Financeiros</h1>
+    <a href="../index.html" class="btn">⬅️ Voltar ao Menu</a>
+      <!-- Ícone de menu -->
+  <div class="hamburger" onclick="toggleMenu(this)">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Menu lateral -->
+  <nav id="mobileMenu">
+    <a href="../index.html" class="btn">🏠 Início</a>
+    <a href="barbeiros.html" class="btn">💈 Barbeiros</a>
+    <a href="servicos.html" class="btn">💆 Serviços</a>
+    <a href="vendas.html" class="btn">💵 Caixa</a>
+    <a href="despesas.html" class="btn">💸 Despesas</a>
+    <a href="relatorios.html" class="btn">📊 Relatórios</a>
+  </nav>
+  </header>
+
+  <main>
+    <section id="resumo">
+      <h2>Resumo Financeiro</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>💰 Total de Vendas</h3>
+          <p id="totalVendas">R$ 0,00</p>
+        </div>
+        <div class="card">
+          <h3>💇‍♂️ Total de Comissões</h3>
+          <p id="totalComissoes">R$ 0,00</p>
+        </div>
+        <div class="card">
+          <h3>💸 Total de Despesas</h3>
+          <p id="totalDespesas">R$ 0,00</p>
+        </div>
+        <div class="card destaque">
+          <h3>📈 Lucro Líquido</h3>
+          <p id="lucroLiquido">R$ 0,00</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grafico">
+      <h2>Distribuição Financeira</h2>
+      <canvas id="graficoFinanceiro"></canvas>
+    </section>
+  </main>
+
+  <script src="../js/relatorios.js"></script>
+  <script>
+    function toggleMenu(icon) {
+      icon.classList.toggle("active");
+      document.getElementById("mobileMenu").classList.toggle("active");
+    }
+  </script>
+</body>
+</html>

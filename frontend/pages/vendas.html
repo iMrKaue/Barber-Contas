@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caixa do Dia - Barber Contas</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <header>
+    <h1>💵 Caixa do Dia</h1>
+    <a href="../index.html" class="btn">⬅️ Voltar ao Menu</a>
+      <!-- Ícone de menu -->
+  <div class="hamburger" onclick="toggleMenu(this)">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Menu lateral -->
+  <nav id="mobileMenu">
+    <a href="../index.html" class="btn">🏠 Início</a>
+    <a href="barbeiros.html" class="btn">💈 Barbeiros</a>
+    <a href="servicos.html" class="btn">💆 Serviços</a>
+    <a href="vendas.html" class="btn">💵 Caixa</a>
+    <a href="despesas.html" class="btn">💸 Despesas</a>
+    <a href="relatorios.html" class="btn">📊 Relatórios</a>
+  </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Registrar Venda</h2>
+      <form id="formVenda">
+        <select id="barbeiro" required>
+          <option value="">Selecione o Barbeiro</option>
+        </select>
+
+        <select id="servico" required>
+          <option value="">Selecione o Serviço</option>
+        </select>
+
+        <input type="number" step="0.01" id="valor" placeholder="Valor recebido (R$)" required />
+
+        <select id="metodo" required>
+          <option value="">Forma de pagamento</option>
+          <option value="dinheiro">Dinheiro</option>
+          <option value="cartao">Cartão</option>
+          <option value="pix">Pix</option>
+        </select>
+
+        <button type="submit" class="btn">Salvar Venda</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Vendas Registradas</h2>
+      <table id="tabelaVendas">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Barbeiro</th>
+            <th>Serviço</th>
+            <th>Valor Bruto</th>
+            <th>Comissão</th>
+            <th>Pagamento</th>
+            <th>Data</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- 🚨 ESSA LINHA É FUNDAMENTAL -->
+  <script src="../js/vendas.js"></script>
+  <script>
+    function toggleMenu(icon) {
+      icon.classList.toggle("active");
+      document.getElementById("mobileMenu").classList.toggle("active");
+    }
+  </script>
+</body>
+</html>

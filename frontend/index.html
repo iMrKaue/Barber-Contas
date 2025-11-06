@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barber Contas 💈</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>💈 Barber Contas</h1>
+    <p>Barber Contas — Gestão Inteligente 💈</p>
+
+    <!-- Ícone do menu mobile -->
+    <div class="hamburger" onclick="toggleMenu(this)">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+
+    <!-- Menu lateral -->
+    <nav id="mobileMenu">
+      <a href="index.html" class="btn">🏠 Início</a>
+      <a href="pages/barbeiros.html" class="btn">💈 Barbeiros</a>
+      <a href="pages/servicos.html" class="btn">💆 Serviços</a>
+      <a href="pages/vendas.html" class="btn">💵 Caixa</a>
+      <a href="pages/despesas.html" class="btn">💸 Despesas</a>
+      <a href="pages/relatorios.html" class="btn">📊 Relatórios</a>
+    </nav>
+  </header>
+
+  <main class="menu">
+    <h2>Escolha uma opção</h2>
+    <div class="menu-buttons">
+      <a href="pages/barbeiros.html" class="btn">💈 Barbeiros</a>
+      <a href="pages/servicos.html" class="btn">💆 Serviços</a>
+      <a href="pages/vendas.html" class="btn">💵 Caixa do Dia</a>
+      <a href="pages/despesas.html" class="btn">💸 Despesas</a>
+      <a href="pages/relatorios.html" class="btn">📊 Relatórios</a>
+    </div>
+  </main>
+
+  <!-- Script do menu -->
+  <script>
+    function toggleMenu(icon) {
+      icon.classList.toggle("active");
+      document.getElementById("mobileMenu").classList.toggle("active");
+    }
+  </script>
+
+  <footer>
+    <p>💈 Desenvolvido com estilo por <span>Grupo BigGym</span> © 2025</p>
+  </footer>
+
+</body>
+</html>

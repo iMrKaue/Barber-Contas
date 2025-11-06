@@ -1,0 +1,69 @@
+// frontend/js/despesas.js
+console.log("💸 Script despesas.js carregado!");
+
+const API_DESPESAS = "http://localhost:3000/api/despesas";
+
+const form = document.getElementById("formDespesa");
+const tabela = document.querySelector("#tabelaDespesas tbody");
+
+// Carregar lista de despesas
+async function carregarDespesas() {
+  const res = await fetch(API_DESPESAS);
+  const despesas = await res.json();
+
+  tabela.innerHTML = "";
+  despesas.forEach((d) => {
+    const linha = document.createElement("tr");
+    linha.innerHTML = `
+      <td>${d.id}</td>
+      <td>${d.descricao}</td>
+      <td>${d.categoria}</td>
+      <td>R$ ${parseFloat(d.valor).toFixed(2)}</td>
+      <td>${new Date(d.data_despesa).toLocaleDateString()}</td>
+      <td><button onclick="excluirDespesa(${d.id})">🗑️ Excluir</button></td>
+    `;
+    tabela.appendChild(linha);
+  });
+}
+
+// Registrar nova despesa
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const nova = {
+    descricao: document.getElementById("descricao").value,
+    categoria: document.getElementById("categoria").value,
+    valor: parseFloat(document.getElementById("valor").value),
+    data_despesa: document.getElementById("data").value,
+  };
+
+  const res = await fetch(API_DESPESAS, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(nova),
+  });
+
+  if (res.ok) {
+    alert("Despesa registrada com sucesso!");
+    form.reset();
+    carregarDespesas();
+  } else {
+    alert("Erro ao registrar despesa.");
+  }
+});
+
+// Excluir despesa
+async function excluirDespesa(id) {
+  if (confirm("Deseja realmente excluir esta despesa?")) {
+    const res = await fetch(`${API_DESPESAS}/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      alert("Despesa excluída com sucesso!");
+      carregarDespesas();
+    } else {
+      alert("Erro ao excluir despesa.");
+    }
+  }
+}
+
+// Inicializar
+carregarDespesas();
