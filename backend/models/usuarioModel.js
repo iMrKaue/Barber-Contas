@@ -1,4 +1,3 @@
-// backend/models/usuarioModel.js
 const db = require('../config/db');
 
 const Usuario = {

@@ -46,25 +46,32 @@ exports.register = (req, res) => {
 
 // Login
 exports.login = (req, res) => {
-  const erros = validationResult(req);
-  if (!erros.isEmpty()) return res.status(400).json({ errors: erros.array() });
-
-  const { email, senha } = req.body;
-
-  Usuario.buscarPorEmail(email, async (err, results) => {
-    if (results.length === 0)
-      return res.status(404).json({ message: 'Usuário não encontrado' });
-
-    const usuario = results[0];
-    const match = await bcrypt.compare(senha, usuario.senha);
-    if (!match) return res.status(401).json({ message: 'Senha incorreta' });
-
-    const token = jwt.sign(
-      { id: usuario.id, nome: usuario.nome, nivel: usuario.nivel },
-      JWT_SECRET,
-      { expiresIn: '8h' }
-    );
-
-    res.json({ message: 'Login bem-sucedido', token });
-  });
-};
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) return res.status(400).json({ errors: erros.array() });
+  
+    const { email, senha } = req.body;
+  
+    Usuario.buscarPorEmail(email, async (err, results) => {
+      if (err) {
+        console.error("❌ Erro ao buscar usuário:", err.sqlMessage || err);
+        return res.status(500).json({ message: "Erro interno ao buscar usuário" });
+      }
+  
+      if (!results || results.length === 0) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+  
+      const usuario = results[0];
+      const match = await bcrypt.compare(senha, usuario.senha);
+      if (!match) return res.status(401).json({ message: 'Senha incorreta' });
+  
+      const token = jwt.sign(
+        { id: usuario.id, nome: usuario.nome, nivel: usuario.nivel },
+        JWT_SECRET,
+        { expiresIn: '8h' }
+      );
+  
+      res.json({ message: 'Login bem-sucedido', token });
+    });
+  };
+  
