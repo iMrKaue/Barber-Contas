@@ -52,14 +52,13 @@ exports.login = (req, res) => {
     const { email, senha } = req.body;
   
     Usuario.buscarPorEmail(email, async (err, results) => {
-      if (err) {
-        console.error("❌ Erro ao buscar usuário:", err.sqlMessage || err);
-        return res.status(500).json({ message: "Erro interno ao buscar usuário" });
-      }
-  
-      if (!results || results.length === 0) {
-        return res.status(404).json({ message: 'Usuário não encontrado' });
-      }
+        if (err) {
+            console.error("❌ Erro ao buscar usuário:", err.sqlMessage || err);
+            return res.status(500).json({ message: "Erro interno ao buscar usuário" });
+          }
+          if (results && results.length > 0) {
+            return res.status(400).json({ message: 'Email já cadastrado' });
+          }          
   
       const usuario = results[0];
       const match = await bcrypt.compare(senha, usuario.senha);
@@ -69,7 +68,7 @@ exports.login = (req, res) => {
         { id: usuario.id, nome: usuario.nome, nivel: usuario.nivel },
         JWT_SECRET,
         { expiresIn: '8h' }
-      );
+      );      
   
       res.json({ message: 'Login bem-sucedido', token });
     });

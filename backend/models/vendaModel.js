@@ -64,6 +64,11 @@ const Venda = {
     `;
     db.query(sql, [barbeiro_id], callback);
   },
+
+  // 🔹 Nova função correta (dentro do objeto)
+  listarPorUsuario: (usuario_id, callback) => {
+    db.query('SELECT * FROM vendas WHERE usuario_id = ?', [usuario_id], callback);
+  },
 };
 
 module.exports = Venda;

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Meu Perfil</title>
+</head>
+<body>
+  <h2>Meu Perfil</h2>
+  <div id="perfilInfo"></div>
+  <button onclick="sair()">Sair</button>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "login.html";
+
+    const user = JSON.parse(atob(token.split('.')[1]));
+    document.getElementById("perfilInfo").innerHTML = `
+      <p><b>Nome:</b> ${user.nome}</p>
+      <p><b>Nível:</b> ${user.nivel}</p>
+    `;
+
+    function sair() {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

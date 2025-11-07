@@ -8,6 +8,11 @@
 </head>
 <body>
 
+  <header id="userHeader">
+    <div id="userInfo"></div>
+    <button id="logoutBtn">Sair</button>
+  </header>  
+
   <header>
     <h1>💈 Barber Contas</h1>
     <p>Barber Contas — Gestão Inteligente 💈</p>
@@ -52,6 +57,33 @@
       icon.classList.toggle("active");
       document.getElementById("mobileMenu").classList.toggle("active");
     }
+
+    // Verifica se está logado
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "./pages/login.html";
+}
+
+// Decodifica o token JWT pra exibir nome
+function parseJwt(token) {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+}
+
+const user = parseJwt(token);
+if (user) {
+  document.getElementById("userInfo").textContent = `👋 Olá, ${user.nome}`;
+}
+
+// Botão de sair
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "./pages/login.html";
+});
+  
   </script>
 
   <footer>
