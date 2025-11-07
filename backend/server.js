@@ -16,13 +16,15 @@ const app = express();
 // ✅ Configuração CORS completa
 app.use(cors({
   origin: [
-    'http://127.0.0.1:8080',
-    'http://localhost:8080',
-    'https://barber-contas.vercel.app'
+    'http://127.0.0.1:8080', // desenvolvimento local
+    'http://localhost:8080', // VS Code Live Server
+    'https://barber-contas.vercel.app', // domínio final da Vercel (produção)
+    'https://barber-contas-git-master-kaues-projects-f3c020b1.vercel.app' // link de preview
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 app.use(express.json());
 
