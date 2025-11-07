@@ -79,6 +79,18 @@ function criarOutrasTabelas() {
     )
   `;
 
+  // 🔹 Cria/verifica a tabela de usuários
+  const sqlUsuarios = `
+    CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    nivel ENUM('admin', 'barbeiro') DEFAULT 'barbeiro',
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`;
+
   connection.query(barbeiros, (err) => {
     if (err) return console.error('❌ Erro ao criar tabela barbeiros:', err.sqlMessage);
     console.log('✅ Tabela barbeiros criada/verificada.');
@@ -90,6 +102,14 @@ function criarOutrasTabelas() {
       connection.query(vendas, (err3) => {
         if (err3) return console.error('❌ Erro ao criar tabela vendas:', err3.sqlMessage);
         console.log('✅ Tabela vendas criada/verificada (com FKs CASCADE).');
+
+        connection.query(sqlUsuarios, (err) => {
+          if (err) {
+            console.error('❌ Erro ao criar/verificar tabela usuarios:', err.sqlMessage);
+          } else {
+            console.log('✅ Tabela usuarios criada/verificada.');
+          }
+        });
       });
     });
   });
