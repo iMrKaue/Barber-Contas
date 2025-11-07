@@ -12,8 +12,7 @@ const tabela = document.querySelector("#tabelaBarbeiros tbody");
 
 // Carregar lista inicial
 async function carregarBarbeiros() {
-  const res = await fetch(API_URL);
-  const barbeiros = await res.json();
+  const barbeiros = await apiFetch("/api/barbeiros");
 
   tabela.innerHTML = "";
   barbeiros.forEach((b) => {
@@ -24,13 +23,12 @@ async function carregarBarbeiros() {
       <td>${b.email}</td>
       <td>${b.percentual_comissao}%</td>
       <td>${b.ativo ? "Ativo" : "Inativo"}</td>
-      <td>
-        <button onclick="excluirBarbeiro(${b.id})">🗑️ Excluir</button>
-      </td>
+      <td><button onclick="excluirBarbeiro(${b.id})">🗑️ Excluir</button></td>
     `;
     tabela.appendChild(linha);
   });
 }
+
 
 // Cadastrar novo barbeiro
 form.addEventListener("submit", async (e) => {
@@ -43,31 +41,22 @@ form.addEventListener("submit", async (e) => {
     percentual_comissao: parseFloat(document.getElementById("comissao").value),
   };
 
-  const res = await fetch(API_URL, {
+  await apiFetch("/api/barbeiros", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(novo),
+    body: JSON.stringify(novo)
   });
 
-  if (res.ok) {
-    alert("Barbeiro cadastrado com sucesso!");
-    form.reset();
-    carregarBarbeiros();
-  } else {
-    alert("Erro ao cadastrar barbeiro.");
-  }
+  alert("Barbeiro cadastrado com sucesso!");
+  form.reset();
+  carregarBarbeiros();
 });
 
 // Excluir barbeiro
 async function excluirBarbeiro(id) {
   if (confirm("Deseja realmente excluir este barbeiro?")) {
-    const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      alert("Barbeiro excluído com sucesso!");
-      carregarBarbeiros();
-    } else {
-      alert("Erro ao excluir barbeiro.");
-    }
+    await apiFetch(`/api/barbeiros/${id}`, { method: "DELETE" });
+    alert("Barbeiro excluído com sucesso!");
+    carregarBarbeiros();
   }
 }
 

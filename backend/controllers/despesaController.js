@@ -1,10 +1,22 @@
+const jwt = require("jsonwebtoken");
 const Despesa = require('../models/despesaModel');
 
 exports.listar = (req, res) => {
-  Despesa.listarTodas((err, results) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage || err });
-    res.json(results);
-  });
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Token ausente" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const usuario_id = decoded.id;
+
+    const sql = "SELECT * FROM despesas WHERE usuario_id = ?";
+    db.query(sql, [usuario_id], (err, results) => {
+      if (err) return res.status(500).json({ message: err.sqlMessage });
+      res.json(results);
+    });
+  } catch {
+    res.status(401).json({ message: "Token inválido" });
+  }
 };
 
 exports.buscar = (req, res) => {
@@ -18,11 +30,27 @@ exports.buscar = (req, res) => {
 };
 
 exports.criar = (req, res) => {
-  Despesa.criar(req.body, (err, results) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage || err });
-    res.status(201).json({ id: results.insertId, ...req.body });
-  });
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Token ausente" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const usuario_id = decoded.id;
+    const { descricao, categoria, valor, data_despesa } = req.body;
+
+    const sql = `
+      INSERT INTO despesas (descricao, categoria, valor, data_despesa, usuario_id)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(sql, [descricao, categoria, valor, data_despesa, usuario_id], (err, result) => {
+      if (err) return res.status(500).json({ message: err.sqlMessage });
+      res.status(201).json({ message: 'Despesa adicionada com sucesso!' });
+    });
+  } catch {
+    res.status(401).json({ message: "Token inválido" });
+  }
 };
+
 
 exports.atualizar = (req, res) => {
   const { id } = req.params;

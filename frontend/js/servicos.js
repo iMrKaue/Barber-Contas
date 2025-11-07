@@ -29,6 +29,22 @@ async function carregarServicos() {
 }
 
 // Cadastra um novo serviço
+async function carregarServicos() {
+  const servicos = await apiFetch("/api/servicos");
+
+  tabela.innerHTML = "";
+  servicos.forEach((s) => {
+    const linha = document.createElement("tr");
+    linha.innerHTML = `
+      <td>${s.id}</td>
+      <td>${s.nome}</td>
+      <td>R$ ${parseFloat(s.preco_base).toFixed(2)}</td>
+      <td><button onclick="excluirServico(${s.id})">🗑️ Excluir</button></td>
+    `;
+    tabela.appendChild(linha);
+  });
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -37,31 +53,22 @@ form.addEventListener("submit", async (e) => {
     preco_base: parseFloat(document.getElementById("preco").value),
   };
 
-  const res = await fetch(API_URL, {
+  await apiFetch("/api/servicos", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(novo),
+    body: JSON.stringify(novo)
   });
 
-  if (res.ok) {
-    alert("Serviço cadastrado com sucesso!");
-    form.reset();
-    carregarServicos();
-  } else {
-    alert("Erro ao cadastrar serviço.");
-  }
+  alert("Serviço cadastrado com sucesso!");
+  form.reset();
+  carregarServicos();
 });
 
 // Exclui um serviço
 async function excluirServico(id) {
   if (confirm("Deseja realmente excluir este serviço?")) {
-    const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      alert("Serviço excluído com sucesso!");
-      carregarServicos();
-    } else {
-      alert("Erro ao excluir serviço.");
-    }
+    await apiFetch(`/api/servicos/${id}`, { method: "DELETE" });
+    alert("Serviço excluído com sucesso!");
+    carregarServicos();
   }
 }
 

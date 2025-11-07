@@ -13,13 +13,10 @@ const tabela = document.querySelector("#tabelaVendas tbody");
 
 // Preenche selects com barbeiros e serviços
 async function carregarSelects() {
-  const [barbeirosRes, servicosRes] = await Promise.all([
-    fetch(API_BARBEIROS),
-    fetch(API_SERVICOS),
+  const [barbeiros, servicos] = await Promise.all([
+    apiFetch("/api/barbeiros"),
+    apiFetch("/api/servicos"),
   ]);
-
-  const barbeiros = await barbeirosRes.json();
-  const servicos = await servicosRes.json();
 
   const selectBarbeiro = document.getElementById("barbeiro");
   const selectServico = document.getElementById("servico");
@@ -44,8 +41,7 @@ async function carregarSelects() {
 
 // Carrega lista de vendas
 async function carregarVendas() {
-  const res = await fetch(API_VENDAS);
-  const vendas = await res.json();
+  const vendas = await apiFetch("/api/vendas");
 
   tabela.innerHTML = "";
   vendas.forEach((v) => {
@@ -64,7 +60,6 @@ async function carregarVendas() {
   });
 }
 
-// Registrar nova venda
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -75,31 +70,22 @@ form.addEventListener("submit", async (e) => {
     metodo_pagamento: document.getElementById("metodo").value,
   };
 
-  const res = await fetch(API_VENDAS, {
+  await apiFetch("/api/vendas", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(nova),
+    body: JSON.stringify(nova)
   });
 
-  if (res.ok) {
-    alert("Venda registrada com sucesso!");
-    form.reset();
-    carregarVendas();
-  } else {
-    alert("Erro ao registrar venda.");
-  }
+  alert("Venda registrada com sucesso!");
+  form.reset();
+  carregarVendas();
 });
 
 // Excluir venda
 async function excluirVenda(id) {
   if (confirm("Deseja realmente excluir esta venda?")) {
-    const res = await fetch(`${API_VENDAS}/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      alert("Venda excluída com sucesso!");
-      carregarVendas();
-    } else {
-      alert("Erro ao excluir venda.");
-    }
+    await apiFetch(`/api/vendas/${id}`, { method: "DELETE" });
+    alert("Venda excluída com sucesso!");
+    carregarVendas();
   }
 }
 

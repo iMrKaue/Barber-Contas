@@ -12,8 +12,7 @@ const tabela = document.querySelector("#tabelaDespesas tbody");
 
 // Carregar lista de despesas
 async function carregarDespesas() {
-  const res = await fetch(API_DESPESAS);
-  const despesas = await res.json();
+  const despesas = await apiFetch("/api/despesas");
 
   tabela.innerHTML = "";
   despesas.forEach((d) => {
@@ -29,6 +28,26 @@ async function carregarDespesas() {
     tabela.appendChild(linha);
   });
 }
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const nova = {
+    descricao: document.getElementById("descricao").value,
+    categoria: document.getElementById("categoria").value,
+    valor: parseFloat(document.getElementById("valor").value),
+    data_despesa: document.getElementById("data").value,
+  };
+
+  await apiFetch("/api/despesas", {
+    method: "POST",
+    body: JSON.stringify(nova)
+  });
+
+  alert("Despesa registrada com sucesso!");
+  form.reset();
+  carregarDespesas();
+});
 
 // Registrar nova despesa
 form.addEventListener("submit", async (e) => {
@@ -59,13 +78,9 @@ form.addEventListener("submit", async (e) => {
 // Excluir despesa
 async function excluirDespesa(id) {
   if (confirm("Deseja realmente excluir esta despesa?")) {
-    const res = await fetch(`${API_DESPESAS}/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      alert("Despesa excluída com sucesso!");
-      carregarDespesas();
-    } else {
-      alert("Erro ao excluir despesa.");
-    }
+    await apiFetch(`/api/despesas/${id}`, { method: "DELETE" });
+    alert("Despesa excluída com sucesso!");
+    carregarDespesas();
   }
 }
 

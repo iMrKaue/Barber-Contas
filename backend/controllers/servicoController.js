@@ -1,10 +1,22 @@
+const jwt = require("jsonwebtoken");
 const Servico = require('../models/servicoModel');
 
 exports.listar = (req, res) => {
-  Servico.listarTodos((err, results) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage || err });
-    res.json(results);
-  });
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Token ausente" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const usuario_id = decoded.id;
+
+    const sql = "SELECT * FROM servicos WHERE usuario_id = ?";
+    db.query(sql, [usuario_id], (err, results) => {
+      if (err) return res.status(500).json({ message: err.sqlMessage });
+      res.json(results);
+    });
+  } catch {
+    res.status(401).json({ message: "Token inválido" });
+  }
 };
 
 exports.buscar = (req, res) => {
@@ -18,11 +30,27 @@ exports.buscar = (req, res) => {
 };
 
 exports.criar = (req, res) => {
-  Servico.criar(req.body, (err, results) => {
-    if (err) return res.status(500).json({ error: err.sqlMessage || err });
-    res.status(201).json({ id: results.insertId, ...req.body });
-  });
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Token ausente" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const usuario_id = decoded.id;
+    const { nome, preco_base } = req.body;
+
+    const sql = `
+      INSERT INTO servicos (nome, preco_base, usuario_id)
+      VALUES (?, ?, ?)
+    `;
+    db.query(sql, [nome, preco_base, usuario_id], (err, result) => {
+      if (err) return res.status(500).json({ message: err.sqlMessage });
+      res.status(201).json({ message: 'Serviço criado com sucesso!' });
+    });
+  } catch {
+    res.status(401).json({ message: "Token inválido" });
+  }
 };
+
 
 exports.atualizar = (req, res) => {
   const { id } = req.params;

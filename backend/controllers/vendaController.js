@@ -9,7 +9,22 @@ exports.listar = (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const usuario_id = decoded.id;
 
-    Venda.listarPorUsuario(usuario_id, (err, results) => {
+    const sql = `
+      SELECT 
+        v.id,
+        b.nome AS barbeiro,
+        s.nome AS servico,
+        v.valor_bruto,
+        v.metodo_pagamento,
+        v.comissao,
+        v.data_venda
+      FROM vendas v
+      JOIN barbeiros b ON v.barbeiro_id = b.id
+      JOIN servicos s ON v.servico_id = s.id
+      WHERE v.usuario_id = ?
+      ORDER BY v.data_venda DESC
+    `;
+    db.query(sql, [usuario_id], (err, results) => {
       if (err) return res.status(500).json({ message: err.sqlMessage });
       res.json(results);
     });
