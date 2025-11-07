@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Barber Contas</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 0 12px rgba(255,255,255,0.1);
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+    }
+    button {
+      width: 95%;
+      padding: 10px;
+      background: #00c853;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover { background: #00a84b; }
+    .toggle { color: #bbb; margin-top: 15px; cursor: pointer; }
+    #mensagem { margin-top: 15px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="titulo">Login</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="senha" placeholder="Senha" required />
+      <input type="text" id="nome" placeholder="Nome completo" style="display:none;" />
+      <button type="submit" id="btnLogin">Entrar</button>
+    </form>
+    <p class="toggle" id="toggle">Não tem conta? Cadastre-se</p>
+    <p id="mensagem"></p>
+  </div>
+
+  <script>
+    const API_URL = window.location.hostname.includes("localhost")
+      ? "http://localhost:3000/api"
+      : "https://barber-contas.onrender.com/api";
+
+    const form = document.getElementById("loginForm");
+    const nome = document.getElementById("nome");
+    const email = document.getElementById("email");
+    const senha = document.getElementById("senha");
+    const msg = document.getElementById("mensagem");
+    const toggle = document.getElementById("toggle");
+    const titulo = document.getElementById("titulo");
+    const btnLogin = document.getElementById("btnLogin");
+
+    let modoCadastro = false;
+
+    // Alternar entre login e cadastro
+    toggle.addEventListener("click", () => {
+      modoCadastro = !modoCadastro;
+      if (modoCadastro) {
+        nome.style.display = "block";
+        titulo.textContent = "Cadastro";
+        btnLogin.textContent = "Cadastrar";
+        toggle.textContent = "Já tem conta? Fazer login";
+      } else {
+        nome.style.display = "none";
+        titulo.textContent = "Login";
+        btnLogin.textContent = "Entrar";
+        toggle.textContent = "Não tem conta? Cadastre-se";
+      }
+    });
+
+    // Envio do formulário
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const endpoint = modoCadastro ? "/auth/register" : "/auth/login";
+      const body = modoCadastro
+        ? { nome: nome.value, email: email.value, senha: senha.value }
+        : { email: email.value, senha: senha.value };
+
+      try {
+        const resp = await fetch(`${API_URL}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const data = await resp.json();
+
+        if (resp.ok) {
+          if (modoCadastro) {
+            msg.textContent = "✅ Cadastro realizado! Agora faça login.";
+            modoCadastro = false;
+            nome.style.display = "none";
+            titulo.textContent = "Login";
+            btnLogin.textContent = "Entrar";
+            toggle.textContent = "Não tem conta? Cadastre-se";
+          } else {
+            localStorage.setItem("token", data.token);
+            msg.textContent = "✅ Login bem-sucedido! Redirecionando...";
+            setTimeout(() => (window.location.href = "../index.html"), 1500);
+          }
+        } else {
+          msg.textContent = "❌ " + (data.message || "Erro no servidor");
+        }
+      } catch (error) {
+        msg.textContent = "❌ Falha de conexão com o servidor.";
+      }
+    });
+  </script>
+</body>
+</html>

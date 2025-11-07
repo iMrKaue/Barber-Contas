@@ -43,6 +43,11 @@
 
   <!-- Script do menu -->
   <script>
+    if (!localStorage.getItem("token")) {
+    window.location.href = "./pages/login.html";
+  }
+
+
     function toggleMenu(icon) {
       icon.classList.toggle("active");
       document.getElementById("mobileMenu").classList.toggle("active");
