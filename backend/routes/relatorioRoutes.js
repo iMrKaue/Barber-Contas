@@ -37,4 +37,6 @@ router.get('/despesas-categoria', relatorioController.despesasPorCategoria);
 // Vendas por método de pagamento
 router.get('/vendas-metodo', relatorioController.vendasPorMetodoPagamento);
 
+router.get("/mensal/pdf", verificarToken, relatorioController.gerarRelatorioMensalPDF);
+
 module.exports = router;

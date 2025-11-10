@@ -12,13 +12,12 @@
     <div class="logo-area">
       💈 <span>Barber Contas</span>
     </div>
-  
     <div class="user-area">
       <span id="userInfo" class="username">👋 Olá, Kauê</span>
       <button id="logoutBtn" class="logout-btn">🚪 Sair da Conta</button>
     </div>
   </header>
-  
+
   <!-- Menu lateral -->
   <nav id="mobileMenu">
     <a href="index.html" class="btn">🏠 Início</a>
@@ -28,7 +27,7 @@
     <a href="pages/despesas.html" class="btn">💸 Despesas</a>
     <a href="pages/relatorios.html" class="btn">📊 Relatórios</a>
   </nav>
-  
+
   <main class="menu">
     <h2>Escolha uma opção</h2>
     <div class="menu-buttons">
@@ -38,61 +37,71 @@
       <a href="pages/despesas.html" class="btn">💸 Despesas</a>
       <a href="pages/relatorios.html" class="btn">📊 Relatórios</a>
     </div>
-  </main>  
 
-  <!-- Script do menu -->
+  </main>
+
+  <footer>
+    <p>💈 Desenvolvido com estilo por <span>Grupo BigGym</span> © 2025</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/toast.js"></script>
+
   <script>
     if (!localStorage.getItem("token")) {
-    window.location.href = "./pages/login.html";
-  }
-
+      window.location.href = "./pages/login.html";
+    }
 
     function toggleMenu(icon) {
       icon.classList.toggle("active");
       document.getElementById("mobileMenu").classList.toggle("active");
     }
 
-    // Verifica se está logado
-const token = localStorage.getItem("token");
-if (!token) {
-  window.location.href = "./pages/login.html";
-}
+    // Exibir nome do usuário
+    const token = localStorage.getItem("token");
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+        );
+        return JSON.parse(jsonPayload);
+      } catch {
+        return null;
+      }
+    }
+    const user = parseJwt(token);
+    if (user) document.getElementById("userInfo").textContent = `👋 Olá, ${user.nome}`;
 
-// Decodifica o token JWT pra exibir nome (com suporte a UTF-8)
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    return null;
-  }
-}
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "./pages/login.html";
+    });
 
-const user = parseJwt(token);
-if (user) {
-  document.getElementById("userInfo").textContent = `👋 Olá, ${user.nome}`;
-}
+    // Carregar resumo do caixa
+    async function carregarCaixaDoDia() {
+      try {
+        const data = await apiFetch("/api/caixa/fechamentos");
+        const hoje = new Date().toISOString().split("T")[0];
+        const caixaHoje = data.find(c => c.data_caixa.startsWith(hoje));
 
-// Botão de sair
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  localStorage.removeItem("token");
-  window.location.href = "./pages/login.html";
-});
-  
+        if (caixaHoje) {
+          document.getElementById("vendasHoje").textContent = `R$ ${caixaHoje.total_vendas.toFixed(2)}`;
+          document.getElementById("despesasHoje").textContent = `R$ ${caixaHoje.total_despesas.toFixed(2)}`;
+          document.getElementById("lucroHoje").textContent = `R$ ${caixaHoje.lucro_liquido.toFixed(2)}`;
+        } else {
+          document.getElementById("vendasHoje").textContent = "R$ 0,00";
+          document.getElementById("despesasHoje").textContent = "R$ 0,00";
+          document.getElementById("lucroHoje").textContent = "R$ 0,00";
+        }
+      } catch (err) {
+        console.error("Erro ao carregar caixa do dia:", err);
+      }
+    }
+    document.addEventListener("DOMContentLoaded", carregarCaixaDoDia);
   </script>
-
-  <footer>
-    <p>💈 Desenvolvido com estilo por <span>Grupo BigGym</span> © 2025</p>
-  </footer>
-
 </body>
 </html>

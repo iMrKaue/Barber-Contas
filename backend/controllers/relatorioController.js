@@ -1,4 +1,7 @@
 // backend/controllers/relatorioController.js
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const path = require("path");
 const Relatorio = require('../models/relatorioModel');
 
 // Todas as rotas já têm o middleware de autenticação aplicado nas rotas
@@ -74,5 +77,42 @@ exports.vendasPorMetodoPagamento = (req, res) => {
       });
     }
     res.json(results || []);
+  });
+};
+
+exports.gerarRelatorioMensalPDF = (req, res) => {
+  Relatorio.gerarRelatorioMensal(req.usuario_id, (err, results) => {
+    if (err) return res.status(500).json({ message: "Erro ao gerar relatório", error: err });
+
+    const dados = results[0];
+    const lucroLiquido = dados.total_vendas - dados.total_despesas;
+
+    const doc = new PDFDocument({ margin: 50 });
+    const nomeArquivo = `relatorio_mensal_${Date.now()}.pdf`;
+    const caminho = path.join(__dirname, `../temp/${nomeArquivo}`);
+
+    doc.pipe(fs.createWriteStream(caminho));
+
+    // Cabeçalho
+    doc.fontSize(20).text("💈 Barber Contas - Relatório Mensal", { align: "center" });
+    doc.moveDown();
+
+    // Resumo financeiro
+    doc.fontSize(14).text(`📅 Mês: ${new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`);
+    doc.text(`💵 Total de Vendas: R$ ${dados.total_vendas.toFixed(2)}`);
+    doc.text(`💸 Total de Despesas: R$ ${dados.total_despesas.toFixed(2)}`);
+    doc.text(`🪙 Total de Comissões: R$ ${dados.total_comissoes.toFixed(2)}`);
+    doc.text(`📈 Lucro Líquido: R$ ${lucroLiquido.toFixed(2)}`);
+    doc.moveDown();
+
+    doc.text("Relatório gerado automaticamente pelo sistema Barber Contas 💈", { align: "center" });
+
+    doc.end();
+
+    doc.on("finish", () => {
+      res.download(caminho, nomeArquivo, () => {
+        fs.unlinkSync(caminho); // exclui o PDF após o download
+      });
+    });
   });
 };
