@@ -1,4 +1,7 @@
 // backend/controllers/relatorioController.js
+const db = require("../config/db");
+const fs = require("fs");
+const path = require("path");
 const PDFDocument = require("pdfkit");
 const { Parser } = require("json2csv"); 
 const Relatorio = require('../models/relatorioModel');
@@ -186,8 +189,8 @@ exports.gerarRelatorioMensalPDF = (req, res) => {
   }
 };
 
-// === Exportar dados de vendas e despesas em CSV ===
-exports.exportarCSV = async (req, res) => {
+// === Exportar dados de vendas e despesas em CSV (compatível com Render) ===
+exports.exportarCSV = (req, res) => {
   const tipo = req.params.tipo; // 'vendas' ou 'despesas'
   const usuarioId = req.usuario_id;
 
@@ -216,22 +219,40 @@ exports.exportarCSV = async (req, res) => {
     return res.status(400).json({ message: "Tipo inválido. Use 'vendas' ou 'despesas'." });
   }
 
-  try {
-    const [rows] = await global.db.promise().query(sql, [usuarioId]);
+  db.query(sql, [usuarioId], (err, rows) => {
+    if (err) {
+      console.error("❌ Erro ao exportar CSV:", err);
+      return res.status(500).json({ message: "Erro ao exportar CSV", error: err });
+    }
+
     if (!rows || rows.length === 0) {
       return res.status(404).json({ message: "Nenhum dado encontrado." });
     }
 
-    const json2csvParser = new Parser();
-    const csv = json2csvParser.parse(rows);
+    try {
+      const parser = new Parser();
+      const csv = parser.parse(rows);
 
-    res.header("Content-Type", "text/csv");
-    res.attachment(`${tipo}_backup_${Date.now()}.csv`);
-    res.send(csv);
+      // salva temporariamente no diretório /tmp (Render permite isso)
+      const nomeArquivo = `${tipo}_backup_${Date.now()}.csv`;
+      const caminho = path.join("/tmp", nomeArquivo);
 
-    console.log(`✅ Backup de ${tipo} exportado com sucesso (${rows.length} registros)`);
-  } catch (error) {
-    console.error("❌ Erro ao exportar CSV:", error);
-    res.status(500).json({ message: "Erro ao exportar CSV", error });
-  }
+      fs.writeFileSync(caminho, csv);
+
+      // envia o arquivo para download e depois remove
+      res.download(caminho, nomeArquivo, (erro) => {
+        if (erro) console.error("❌ Erro ao enviar CSV:", erro);
+        try {
+          fs.unlinkSync(caminho);
+        } catch (e) {
+          console.warn("⚠️ Não foi possível remover o CSV temporário:", e.message);
+        }
+      });
+
+      console.log(`✅ Backup de ${tipo} exportado com sucesso (${rows.length} registros)`);
+    } catch (error) {
+      console.error("❌ Erro ao gerar CSV:", error);
+      res.status(500).json({ message: "Erro ao gerar CSV", error });
+    }
+  });
 };
