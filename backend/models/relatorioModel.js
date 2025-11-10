@@ -105,8 +105,8 @@ const Relatorio = {
             AND YEAR(data_venda) = YEAR(CURDATE())) AS total_vendas,
         (SELECT COALESCE(SUM(valor), 0) FROM despesas 
           WHERE usuario_id = ? 
-            AND MONTH(data) = MONTH(CURDATE()) 
-            AND YEAR(data) = YEAR(CURDATE())) AS total_despesas,
+            AND MONTH(data_despesa) = MONTH(CURDATE()) 
+            AND YEAR(data_despesa) = YEAR(CURDATE())) AS total_despesas,
         (SELECT COALESCE(SUM(comissao), 0) FROM vendas 
           WHERE usuario_id = ? 
             AND MONTH(data_venda) = MONTH(CURDATE()) 
@@ -115,6 +115,7 @@ const Relatorio = {
     console.log("📊 Consulta SQL de relatório mensal executada para usuário:", usuario_id);
     db.query(sql, [usuario_id, usuario_id, usuario_id], callback);
   }
+  
 };
 
 module.exports = Relatorio;
