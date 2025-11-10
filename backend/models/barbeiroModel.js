@@ -10,10 +10,10 @@ const Barbeiro = {
   },
 
   criar: (dados, callback) => {
-    const { nome, email, ativo, percentual_comissao } = dados;
+    const { nome, email, ativo, percentual_comissao, usuario_id } = dados;
     db.query(
-      'INSERT INTO barbeiros (nome, email, ativo, percentual_comissao) VALUES (?, ?, ?, ?)',
-      [nome, email, ativo, percentual_comissao],
+      'INSERT INTO barbeiros (nome, email, ativo, percentual_comissao, usuario_id) VALUES (?, ?, ?, ?, ?)',
+      [nome, email, ativo !== undefined ? ativo : true, percentual_comissao || 60, usuario_id],
       callback
     );
   },

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const db = require('../config/db');
 const Despesa = require('../models/despesaModel');
 
 exports.listar = (req, res) => {
@@ -6,7 +7,7 @@ exports.listar = (req, res) => {
   if (!token) return res.status(401).json({ message: "Token ausente" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seusegredoaqui');
     const usuario_id = decoded.id;
 
     const sql = "SELECT * FROM despesas WHERE usuario_id = ?";
@@ -14,7 +15,8 @@ exports.listar = (req, res) => {
       if (err) return res.status(500).json({ message: err.sqlMessage });
       res.json(results);
     });
-  } catch {
+  } catch (error) {
+    console.error('Erro ao verificar token:', error);
     res.status(401).json({ message: "Token inválido" });
   }
 };
@@ -34,7 +36,7 @@ exports.criar = (req, res) => {
   if (!token) return res.status(401).json({ message: "Token ausente" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seusegredoaqui');
     const usuario_id = decoded.id;
     const { descricao, categoria, valor, data_despesa } = req.body;
 
@@ -43,10 +45,14 @@ exports.criar = (req, res) => {
       VALUES (?, ?, ?, ?, ?)
     `;
     db.query(sql, [descricao, categoria, valor, data_despesa, usuario_id], (err, result) => {
-      if (err) return res.status(500).json({ message: err.sqlMessage });
+      if (err) {
+        console.error('Erro ao criar despesa:', err);
+        return res.status(500).json({ message: err.sqlMessage || 'Erro ao criar despesa' });
+      }
       res.status(201).json({ message: 'Despesa adicionada com sucesso!' });
     });
-  } catch {
+  } catch (error) {
+    console.error('Erro ao verificar token:', error);
     res.status(401).json({ message: "Token inválido" });
   }
 };

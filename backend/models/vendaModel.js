@@ -21,10 +21,10 @@ const Venda = {
   },
 
   criar: (dados, callback) => {
-    const { barbeiro_id, servico_id, valor_bruto, metodo_pagamento } = dados;
+    const { barbeiro_id, servico_id, valor_bruto, metodo_pagamento, usuario_id } = dados;
 
-    const sqlComissao = 'SELECT percentual_comissao FROM barbeiros WHERE id = ?';
-    db.query(sqlComissao, [barbeiro_id], (err, result) => {
+    const sqlComissao = 'SELECT percentual_comissao FROM barbeiros WHERE id = ? AND usuario_id = ?';
+    db.query(sqlComissao, [barbeiro_id, usuario_id], (err, result) => {
       if (err) return callback(err);
       if (result.length === 0) return callback({ message: 'Barbeiro não encontrado' });
 
@@ -32,10 +32,10 @@ const Venda = {
       const comissao = (valor_bruto * percentual) / 100;
 
       const sqlInsert = `
-        INSERT INTO vendas (barbeiro_id, servico_id, valor_bruto, metodo_pagamento, comissao)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO vendas (barbeiro_id, servico_id, valor_bruto, metodo_pagamento, comissao, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?)
       `;
-      db.query(sqlInsert, [barbeiro_id, servico_id, valor_bruto, metodo_pagamento, comissao], callback);
+      db.query(sqlInsert, [barbeiro_id, servico_id, valor_bruto, metodo_pagamento, comissao, usuario_id], callback);
     });
   },
 

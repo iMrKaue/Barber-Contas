@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const db = require('../config/db');
 const Venda = require('../models/vendaModel');
 
 exports.listar = (req, res) => {
@@ -6,7 +7,7 @@ exports.listar = (req, res) => {
   if (!token) return res.status(401).json({ message: "Token ausente" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seusegredoaqui');
     const usuario_id = decoded.id;
 
     const sql = `
@@ -28,7 +29,8 @@ exports.listar = (req, res) => {
       if (err) return res.status(500).json({ message: err.sqlMessage });
       res.json(results);
     });
-  } catch {
+  } catch (error) {
+    console.error('Erro ao verificar token:', error);
     res.status(401).json({ message: "Token inválido" });
   }
 };
@@ -46,14 +48,18 @@ exports.criar = (req, res) => {
   if (!token) return res.status(401).json({ message: "Token ausente" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seusegredoaqui');
     const usuario_id = decoded.id;
 
     Venda.criar({ ...req.body, usuario_id }, (err, result) => {
-      if (err) return res.status(500).json({ message: err.sqlMessage });
+      if (err) {
+        console.error('Erro ao criar venda:', err);
+        return res.status(500).json({ message: err.sqlMessage || err.message || 'Erro ao criar venda' });
+      }
       res.status(201).json({ message: "Venda criada com sucesso" });
     });
-  } catch {
+  } catch (error) {
+    console.error('Erro ao verificar token:', error);
     res.status(401).json({ message: "Token inválido" });
   }
 };

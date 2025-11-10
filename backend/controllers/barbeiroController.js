@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const db = require('../config/db');
 const Barbeiro = require('../models/barbeiroModel');
 
 exports.listar = (req, res) => {
@@ -6,7 +7,7 @@ exports.listar = (req, res) => {
   if (!token) return res.status(401).json({ message: "Token ausente" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seusegredoaqui');
     const usuario_id = decoded.id;
 
     const sql = "SELECT * FROM barbeiros WHERE usuario_id = ?";
@@ -14,7 +15,8 @@ exports.listar = (req, res) => {
       if (err) return res.status(500).json({ message: err.sqlMessage });
       res.json(results);
     });
-  } catch {
+  } catch (error) {
+    console.error('Erro ao verificar token:', error);
     res.status(401).json({ message: "Token inválido" });
   }
 };
@@ -33,19 +35,23 @@ exports.criar = (req, res) => {
   if (!token) return res.status(401).json({ message: "Token ausente" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seusegredoaqui');
     const usuario_id = decoded.id;
-    const { nome, email, percentual_comissao } = req.body;
+    const { nome, email, percentual_comissao, ativo } = req.body;
 
     const sql = `
-      INSERT INTO barbeiros (nome, email, percentual_comissao, usuario_id)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO barbeiros (nome, email, percentual_comissao, ativo, usuario_id)
+      VALUES (?, ?, ?, ?, ?)
     `;
-    db.query(sql, [nome, email, percentual_comissao, usuario_id], (err, result) => {
-      if (err) return res.status(500).json({ message: err.sqlMessage });
+    db.query(sql, [nome, email, percentual_comissao || 60, ativo !== undefined ? ativo : true, usuario_id], (err, result) => {
+      if (err) {
+        console.error('Erro ao criar barbeiro:', err);
+        return res.status(500).json({ message: err.sqlMessage || 'Erro ao criar barbeiro' });
+      }
       res.status(201).json({ message: 'Barbeiro criado com sucesso!' });
     });
-  } catch {
+  } catch (error) {
+    console.error('Erro ao verificar token:', error);
     res.status(401).json({ message: "Token inválido" });
   }
 };

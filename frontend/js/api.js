@@ -7,10 +7,20 @@ function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem("token");
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`,
+    ...(token && { "Authorization": `Bearer ${token}` }),
     ...options.headers
   };
 
   return fetch(`${API_BASE}${endpoint}`, { ...options, headers })
-    .then(res => res.json());
+    .then(async (res) => {
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ message: 'Erro na requisição' }));
+        throw new Error(error.message || `Erro ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
+    .catch(error => {
+      console.error('Erro na API:', error);
+      throw error;
+    });
 }

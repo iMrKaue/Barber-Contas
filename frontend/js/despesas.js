@@ -1,10 +1,5 @@
 // frontend/js/despesas.js
 console.log("💸 Script despesas.js carregado!");
-// Detecta se está rodando localmente ou online
-const API_BASE = window.location.hostname.includes("localhost")
-  ? "http://localhost:3000"
-  : "https://barber-contas.onrender.com";
-const API_DESPESAS = `${API_BASE}/api/despesas`;
 
 
 const form = document.getElementById("formDespesa");
@@ -47,32 +42,6 @@ form.addEventListener("submit", async (e) => {
   alert("Despesa registrada com sucesso!");
   form.reset();
   carregarDespesas();
-});
-
-// Registrar nova despesa
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const nova = {
-    descricao: document.getElementById("descricao").value,
-    categoria: document.getElementById("categoria").value,
-    valor: parseFloat(document.getElementById("valor").value),
-    data_despesa: document.getElementById("data").value,
-  };
-
-  const res = await fetch(API_DESPESAS, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(nova),
-  });
-
-  if (res.ok) {
-    alert("Despesa registrada com sucesso!");
-    form.reset();
-    carregarDespesas();
-  } else {
-    alert("Erro ao registrar despesa.");
-  }
 });
 
 // Excluir despesa

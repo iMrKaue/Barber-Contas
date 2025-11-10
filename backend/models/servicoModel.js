@@ -11,10 +11,10 @@ const Servico = {
   },
 
   criar: (dados, callback) => {
-    const { nome, preco_base } = dados;
+    const { nome, preco_base, usuario_id } = dados;
     db.query(
-      'INSERT INTO servicos (nome, preco_base) VALUES (?, ?)',
-      [nome, preco_base],
+      'INSERT INTO servicos (nome, preco_base, usuario_id) VALUES (?, ?, ?)',
+      [nome, preco_base, usuario_id],
       callback
     );
   },

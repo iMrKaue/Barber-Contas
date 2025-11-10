@@ -1,34 +1,10 @@
 // frontend/js/servicos.js
-// Detecta se está rodando localmente ou online
-const API_BASE = window.location.hostname.includes("localhost")
-  ? "http://localhost:3000"
-  : "https://barber-contas.onrender.com";
-
-const API_URL = `${API_BASE}/api/servicos`;
 
 
 const form = document.getElementById("formServico");
 const tabela = document.querySelector("#tabelaServicos tbody");
 
 // Carrega os serviços
-async function carregarServicos() {
-  const res = await fetch(API_URL);
-  const servicos = await res.json();
-
-  tabela.innerHTML = "";
-  servicos.forEach((s) => {
-    const linha = document.createElement("tr");
-    linha.innerHTML = `
-      <td>${s.id}</td>
-      <td>${s.nome}</td>
-      <td>R$ ${parseFloat(s.preco_base).toFixed(2)}</td>
-      <td><button onclick="excluirServico(${s.id})">🗑️ Excluir</button></td>
-    `;
-    tabela.appendChild(linha);
-  });
-}
-
-// Cadastra um novo serviço
 async function carregarServicos() {
   const servicos = await apiFetch("/api/servicos");
 

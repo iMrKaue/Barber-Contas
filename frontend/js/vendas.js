@@ -1,11 +1,4 @@
 // frontend/js/vendas.js
-// Detecta se está rodando localmente ou online
-const API_BASE = window.location.hostname.includes("localhost")
-  ? "http://localhost:3000"
-  : "https://barber-contas.onrender.com";
-const API_VENDAS = `${API_BASE}/api/vendas`;
-const API_BARBEIROS = `${API_BASE}/api/barbeiros`;
-const API_SERVICOS = `${API_BASE}/api/servicos`;
 
 
 const form = document.getElementById("formVenda");
