@@ -40,4 +40,6 @@ router.get('/vendas-metodo', relatorioController.vendasPorMetodoPagamento);
 // Relatório mensal em PDF
 router.get('/mensal/pdf', relatorioController.gerarRelatorioMensalPDF);
 
+router.get("/exportar/:tipo", verificarToken, relatorioController.exportarCSV);
+
 module.exports = router;
