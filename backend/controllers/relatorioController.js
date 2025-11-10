@@ -1,5 +1,6 @@
 // backend/controllers/relatorioController.js
 const PDFDocument = require("pdfkit");
+const { Parser } = require("json2csv"); 
 const Relatorio = require('../models/relatorioModel');
 
 // Função helper para formatar data em português
@@ -182,5 +183,55 @@ exports.gerarRelatorioMensalPDF = (req, res) => {
       message: "Erro interno no servidor: " + (e.message || "Erro desconhecido"),
       error: e.message 
     });
+  }
+};
+
+// === Exportar dados de vendas e despesas em CSV ===
+exports.exportarCSV = async (req, res) => {
+  const tipo = req.params.tipo; // 'vendas' ou 'despesas'
+  const usuarioId = req.usuario_id;
+
+  console.log("☁️ Solicitado backup CSV do tipo:", tipo);
+
+  let sql = "";
+  if (tipo === "vendas") {
+    sql = `
+      SELECT v.id, b.nome AS barbeiro, s.nome AS servico, v.valor_bruto, v.comissao, 
+             v.metodo_pagamento, DATE_FORMAT(v.data_venda, "%d/%m/%Y") AS data_venda
+      FROM vendas v
+      LEFT JOIN barbeiros b ON v.barbeiro_id = b.id
+      LEFT JOIN servicos s ON v.servico_id = s.id
+      WHERE v.usuario_id = ?
+      ORDER BY v.data_venda DESC
+    `;
+  } else if (tipo === "despesas") {
+    sql = `
+      SELECT d.id, d.descricao, d.categoria, d.valor, 
+             DATE_FORMAT(d.data_despesa, "%d/%m/%Y") AS data_despesa
+      FROM despesas d
+      WHERE d.usuario_id = ?
+      ORDER BY d.data_despesa DESC
+    `;
+  } else {
+    return res.status(400).json({ message: "Tipo inválido. Use 'vendas' ou 'despesas'." });
+  }
+
+  try {
+    const [rows] = await global.db.promise().query(sql, [usuarioId]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ message: "Nenhum dado encontrado." });
+    }
+
+    const json2csvParser = new Parser();
+    const csv = json2csvParser.parse(rows);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment(`${tipo}_backup_${Date.now()}.csv`);
+    res.send(csv);
+
+    console.log(`✅ Backup de ${tipo} exportado com sucesso (${rows.length} registros)`);
+  } catch (error) {
+    console.error("❌ Erro ao exportar CSV:", error);
+    res.status(500).json({ message: "Erro ao exportar CSV", error });
   }
 };

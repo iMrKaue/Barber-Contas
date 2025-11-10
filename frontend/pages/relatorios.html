@@ -33,17 +33,25 @@
 
   <main>
     <!-- Filtros de Período -->
-    <section class="dashboard-filters">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2 style="margin: 0;">Filtros de Período</h2>
-        <button id="btnGerarPDF" class="btn" style="margin-left: auto;">🧾 Gerar Relatório Mensal (PDF)</button>
-      </div>
+    <section class="dashboard-filters">    
       <div class="filter-buttons">
         <button class="filter-btn active" data-dias="7">Últimos 7 dias</button>
         <button class="filter-btn" data-dias="30">Últimos 30 dias</button>
         <button class="filter-btn" data-dias="90">Últimos 90 dias</button>
         <button class="filter-btn" data-dias="365">Último ano</button>
+
+      <div class="acoes-relatorio">
+        <button id="btnGerarPDF" class="btn-pdf">
+          🧾 <span>Gerar Relatório Mensal (PDF)</span>
+        </button>
       </div>
+
+        <div class="acoes-relatorio">
+          <button id="btnExportarCSV" class="btn-csv">
+            ☁️ <span>Exportar Dados (CSV)</span>
+          </button>
+        </div>        
+
     </section>
 
     <!-- Cards de Resumo -->
@@ -172,6 +180,36 @@
     }
   });
 </script>  
+
+<script>
+  document.getElementById("btnExportarCSV").addEventListener("click", async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return alert("Você precisa estar logado.");
+  
+      // Pergunta qual tipo exportar
+      const tipo = prompt("Digite o tipo de backup: 'vendas' ou 'despesas'").toLowerCase();
+      if (!["vendas", "despesas"].includes(tipo)) return alert("Tipo inválido.");
+  
+      const response = await fetch(`https://barber-contas.onrender.com/api/relatorios/exportar/${tipo}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+  
+      if (!response.ok) throw new Error("Falha ao exportar CSV");
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${tipo}_backup.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Erro ao exportar CSV:", error);
+      alert("❌ Erro ao exportar CSV");
+    }
+  });
+  </script>  
   
 </body>
 </html>
