@@ -3,35 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relatórios Financeiros - Barber Contas</title>
+  <title>Dashboard - Barber Contas</title>
   <link rel="stylesheet" href="../css/style.css" />
   <!-- Importa o Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <header>
-    <h1>📊 Relatórios Financeiros</h1>
+    <h1>📊 Dashboard</h1>
     <a href="../index.html" class="btn">⬅️ Voltar ao Menu</a>
-      <!-- Ícone de menu -->
-  <div class="hamburger" onclick="toggleMenu(this)">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
+    <!-- Ícone de menu -->
+    <div class="hamburger" onclick="toggleMenu(this)">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
 
-  <!-- Menu lateral -->
-  <nav id="mobileMenu">
-    <a href="../index.html" class="btn">🏠 Início</a>
-    <a href="barbeiros.html" class="btn">💈 Barbeiros</a>
-    <a href="servicos.html" class="btn">💆 Serviços</a>
-    <a href="vendas.html" class="btn">💵 Caixa</a>
-    <a href="despesas.html" class="btn">💸 Despesas</a>
-    <a href="relatorios.html" class="btn">📊 Relatórios</a>
-  </nav>
+    <!-- Menu lateral -->
+    <nav id="mobileMenu">
+      <a href="../index.html" class="btn">🏠 Início</a>
+      <a href="barbeiros.html" class="btn">💈 Barbeiros</a>
+      <a href="servicos.html" class="btn">💆 Serviços</a>
+      <a href="vendas.html" class="btn">💵 Caixa</a>
+      <a href="despesas.html" class="btn">💸 Despesas</a>
+      <a href="relatorios.html" class="btn">📊 Relatórios</a>
+    </nav>
   </header>
 
   <main>
+    <!-- Filtros de Período -->
+    <section class="dashboard-filters">
+      <h2>Filtros de Período</h2>
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-dias="7">Últimos 7 dias</button>
+        <button class="filter-btn" data-dias="30">Últimos 30 dias</button>
+        <button class="filter-btn" data-dias="90">Últimos 90 dias</button>
+        <button class="filter-btn" data-dias="365">Último ano</button>
+      </div>
+    </section>
+
+    <!-- Cards de Resumo -->
     <section id="resumo">
       <h2>Resumo Financeiro</h2>
       <div class="cards">
@@ -54,12 +65,37 @@
       </div>
     </section>
 
-    <section id="grafico">
-      <h2>Distribuição Financeira</h2>
-      <canvas id="graficoFinanceiro"></canvas>
+    <!-- Gráficos -->
+    <section class="dashboard-charts">
+      <div class="chart-container">
+        <h2>📈 Vendas ao Longo do Tempo</h2>
+        <canvas id="graficoVendasTempo"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h2>💇‍♂️ Comissões por Barbeiro</h2>
+        <canvas id="graficoComissoesBarbeiro"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h2>💸 Despesas por Categoria</h2>
+        <canvas id="graficoDespesasCategoria"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h2>💵 Distribuição Financeira</h2>
+        <canvas id="graficoFinanceiro"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <h2>💳 Vendas por Método de Pagamento</h2>
+        <canvas id="graficoMetodoPagamento"></canvas>
+      </div>
     </section>
   </main>
 
+  <script src="../js/api.js"></script>
+  <script src="../js/toast.js"></script>
   <script src="../js/relatorios.js"></script>
   <script>
     function toggleMenu(icon) {

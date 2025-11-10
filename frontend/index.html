@@ -8,33 +8,27 @@
 </head>
 <body>
 
-  <header id="userHeader">
-    <div id="userInfo"></div>
-    <button id="logoutBtn">Sair</button>
-  </header>  
-
-  <header>
-    <h1>💈 Barber Contas</h1>
-    <p>Barber Contas — Gestão Inteligente 💈</p>
-
-    <!-- Ícone do menu mobile -->
-    <div class="hamburger" onclick="toggleMenu(this)">
-      <div></div>
-      <div></div>
-      <div></div>
+  <header class="topbar">
+    <div class="logo-area">
+      💈 <span>Barber Contas</span>
     </div>
-
-    <!-- Menu lateral -->
-    <nav id="mobileMenu">
-      <a href="index.html" class="btn">🏠 Início</a>
-      <a href="pages/barbeiros.html" class="btn">💈 Barbeiros</a>
-      <a href="pages/servicos.html" class="btn">💆 Serviços</a>
-      <a href="pages/vendas.html" class="btn">💵 Caixa</a>
-      <a href="pages/despesas.html" class="btn">💸 Despesas</a>
-      <a href="pages/relatorios.html" class="btn">📊 Relatórios</a>
-    </nav>
+  
+    <div class="user-area">
+      <span id="userInfo" class="username">👋 Olá, Kauê</span>
+      <button id="logoutBtn" class="logout-btn">🚪 Sair da Conta</button>
+    </div>
   </header>
-
+  
+  <!-- Menu lateral -->
+  <nav id="mobileMenu">
+    <a href="index.html" class="btn">🏠 Início</a>
+    <a href="pages/barbeiros.html" class="btn">💈 Barbeiros</a>
+    <a href="pages/servicos.html" class="btn">💆 Serviços</a>
+    <a href="pages/vendas.html" class="btn">💵 Caixa</a>
+    <a href="pages/despesas.html" class="btn">💸 Despesas</a>
+    <a href="pages/relatorios.html" class="btn">📊 Relatórios</a>
+  </nav>
+  
   <main class="menu">
     <h2>Escolha uma opção</h2>
     <div class="menu-buttons">
@@ -44,7 +38,7 @@
       <a href="pages/despesas.html" class="btn">💸 Despesas</a>
       <a href="pages/relatorios.html" class="btn">📊 Relatórios</a>
     </div>
-  </main>
+  </main>  
 
   <!-- Script do menu -->
   <script>
@@ -64,10 +58,20 @@ if (!token) {
   window.location.href = "./pages/login.html";
 }
 
-// Decodifica o token JWT pra exibir nome
+// Decodifica o token JWT pra exibir nome (com suporte a UTF-8)
 function parseJwt(token) {
   try {
-    return JSON.parse(atob(token.split('.')[1]));
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
   } catch (e) {
     return null;
   }

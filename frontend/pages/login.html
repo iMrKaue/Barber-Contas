@@ -59,6 +59,7 @@
     <p id="mensagem"></p>
   </div>
 
+  <script src="../js/toast.js"></script>
   <script>
     const API_URL = window.location.hostname.includes("localhost")
       ? "http://localhost:3000/api"
@@ -111,22 +112,25 @@
 
         if (resp.ok) {
           if (modoCadastro) {
-            msg.textContent = "✅ Cadastro realizado! Agora faça login.";
+            showSuccess("Cadastro realizado! Agora faça login.");
             modoCadastro = false;
             nome.style.display = "none";
             titulo.textContent = "Login";
             btnLogin.textContent = "Entrar";
             toggle.textContent = "Não tem conta? Cadastre-se";
+            msg.textContent = "";
           } else {
             localStorage.setItem("token", data.token);
-            msg.textContent = "✅ Login bem-sucedido! Redirecionando...";
+            showSuccess("Login bem-sucedido! Redirecionando...");
             setTimeout(() => (window.location.href = "../index.html"), 1500);
           }
         } else {
-          msg.textContent = "❌ " + (data.message || "Erro no servidor");
+          showError(data.message || "Erro no servidor");
+          msg.textContent = "";
         }
       } catch (error) {
-        msg.textContent = "❌ Falha de conexão com o servidor.";
+        showError("Falha de conexão com o servidor.");
+        msg.textContent = "";
       }
     });
   </script>

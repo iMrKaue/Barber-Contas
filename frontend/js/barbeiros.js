@@ -26,7 +26,7 @@ async function carregarBarbeiros() {
     }
   } catch (error) {
     console.error("Erro ao carregar barbeiros:", error);
-    alert("Erro ao carregar barbeiros: " + (error.message || "Erro desconhecido"));
+    showError("Erro ao carregar barbeiros: " + (error.message || "Erro desconhecido"));
   }
 }
 
@@ -48,21 +48,26 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify(novo)
     });
 
-    alert("Barbeiro cadastrado com sucesso!");
+    showSuccess("Barbeiro cadastrado com sucesso!");
     form.reset();
     carregarBarbeiros();
   } catch (error) {
     console.error("Erro ao cadastrar barbeiro:", error);
-    alert("Erro ao cadastrar barbeiro: " + (error.message || "Erro desconhecido"));
+    showError("Erro ao cadastrar barbeiro: " + (error.message || "Erro desconhecido"));
   }
 });
 
 // Excluir barbeiro
 async function excluirBarbeiro(id) {
   if (confirm("Deseja realmente excluir este barbeiro?")) {
-    await apiFetch(`/api/barbeiros/${id}`, { method: "DELETE" });
-    alert("Barbeiro excluído com sucesso!");
-    carregarBarbeiros();
+    try {
+      await apiFetch(`/api/barbeiros/${id}`, { method: "DELETE" });
+      showSuccess("Barbeiro excluído com sucesso!");
+      carregarBarbeiros();
+    } catch (error) {
+      console.error("Erro ao excluir barbeiro:", error);
+      showError("Erro ao excluir barbeiro: " + (error.message || "Erro desconhecido"));
+    }
   }
 }
 

@@ -7,7 +7,8 @@ const connection = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  charset: 'utf8mb4'
 });
 
 connection.connect((err) => {
@@ -15,6 +16,11 @@ connection.connect((err) => {
     console.error('❌ Erro ao conectar ao MySQL:', err.sqlMessage);
   } else {
     console.log('✅ Conectado ao MySQL (Railway)');
+    // Define o charset da conexão para UTF-8
+    connection.query('SET NAMES utf8mb4', (err) => {
+      if (err) console.error('❌ Erro ao definir charset:', err.sqlMessage);
+      else console.log('✅ Charset UTF-8 definido');
+    });
     criarTabelasComUsuarioId();
   }
 });
@@ -30,7 +36,7 @@ function criarTabelasComUsuarioId() {
       senha VARCHAR(255) NOT NULL,
       nivel ENUM('admin', 'barbeiro') DEFAULT 'barbeiro',
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `;
 
   connection.query(sqlUsuarios, (err) => {
@@ -119,7 +125,7 @@ function criarTabelasAtualizadas() {
       percentual_comissao DECIMAL(5,2) DEFAULT 60.00,
       usuario_id INT,
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-    )
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `;
 
   const servicos = `
@@ -129,7 +135,7 @@ function criarTabelasAtualizadas() {
       preco_base DECIMAL(10,2) NOT NULL,
       usuario_id INT,
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-    )
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `;
 
   const vendas = `
@@ -145,7 +151,7 @@ function criarTabelasAtualizadas() {
       FOREIGN KEY (barbeiro_id) REFERENCES barbeiros(id) ON DELETE CASCADE,
       FOREIGN KEY (servico_id) REFERENCES servicos(id) ON DELETE CASCADE,
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-    )
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `;
 
   const despesas = `
@@ -157,7 +163,7 @@ function criarTabelasAtualizadas() {
       data_despesa DATE DEFAULT (CURRENT_DATE),
       usuario_id INT,
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-    )
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `;
 
   connection.query(barbeiros, (err) => {
