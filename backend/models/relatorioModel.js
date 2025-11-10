@@ -112,6 +112,7 @@ const Relatorio = {
             AND MONTH(data_venda) = MONTH(CURDATE()) 
             AND YEAR(data_venda) = YEAR(CURDATE())) AS total_comissoes
     `;
+    console.log("📊 Consulta SQL de relatório mensal executada para usuário:", usuario_id);
     db.query(sql, [usuario_id, usuario_id, usuario_id], callback);
   }
 };

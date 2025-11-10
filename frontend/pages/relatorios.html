@@ -19,9 +19,6 @@
       <div></div>
     </div>
 
-    <div class="acoes-relatorio">
-      <button id="btnGerarPDF" class="btn">🧾 Gerar Relatório Mensal (PDF)</button>
-    </div>    
 
     <!-- Menu lateral -->
     <nav id="mobileMenu">
@@ -37,7 +34,10 @@
   <main>
     <!-- Filtros de Período -->
     <section class="dashboard-filters">
-      <h2>Filtros de Período</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="margin: 0;">Filtros de Período</h2>
+        <button id="btnGerarPDF" class="btn" style="margin-left: auto;">🧾 Gerar Relatório Mensal (PDF)</button>
+      </div>
       <div class="filter-buttons">
         <button class="filter-btn active" data-dias="7">Últimos 7 dias</button>
         <button class="filter-btn" data-dias="30">Últimos 30 dias</button>
@@ -109,28 +109,69 @@
   </script>
 
 <script>
-  document.getElementById("btnGerarPDF").addEventListener("click", async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("https://barber-contas.onrender.com/api/relatorios/mensal/pdf", {
-        headers: { "Authorization": `Bearer ${token}` }
+  document.addEventListener("DOMContentLoaded", () => {
+    const btnGerarPDF = document.getElementById("btnGerarPDF");
+    if (btnGerarPDF) {
+      btnGerarPDF.addEventListener("click", async () => {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            if (typeof showError === 'function') {
+              showError("Você precisa estar logado para gerar o relatório.");
+            } else {
+              alert("Você precisa estar logado para gerar o relatório.");
+            }
+            return;
+          }
+
+          if (typeof showInfo === 'function') {
+            showInfo("Gerando relatório PDF...");
+          }
+
+          const API_BASE = window.location.hostname.includes("localhost")
+            ? "http://localhost:3000"
+            : "https://barber-contas.onrender.com";
+
+          const response = await fetch(`${API_BASE}/api/relatorios/mensal/pdf`, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Accept": "application/pdf"
+            }
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: "Erro ao gerar PDF" }));
+            throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
+          }
+
+          // Cria o download automático do arquivo
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `relatorio_mensal_${new Date().getTime()}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+
+          if (typeof showSuccess === 'function') {
+            showSuccess("Relatório PDF gerado com sucesso!");
+          }
+
+        } catch (error) {
+          console.error("Erro ao gerar PDF:", error);
+          if (typeof showError === 'function') {
+            showError("Erro ao gerar relatório: " + (error.message || "Erro desconhecido"));
+          } else {
+            alert("❌ Erro ao gerar relatório: " + (error.message || "Erro desconhecido"));
+          }
+        }
       });
-  
-      if (!response.ok) throw new Error("Falha ao gerar PDF");
-  
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "relatorio_mensal.pdf";
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      alert("❌ Erro ao gerar relatório mensal");
-      console.error(error);
     }
   });
-  </script>
+</script>  
   
 </body>
 </html>
