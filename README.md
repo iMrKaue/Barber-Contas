@@ -153,7 +153,7 @@ barber-contas/
 ### 🔹 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/barber-contas.git
+git clone https://github.com/iMrKaue/Barber-Contas.git
 cd barber-contas
 ```
 
@@ -339,8 +339,8 @@ Frontend pode ser hospedado via **Vercel** (opcional):
 
 - **Kauê Ferreira**
 - Estudante de Análise e Desenvolvimento de Sistemas
-- 📧 Email: kauef.dev@gmail.com
-- 🐙 GitHub: [@kaueferreira](https://github.com/kaueferreira)
+- 📧 Email: kaueferreira2020@hotmail.com
+- 🐙 GitHub: [@iMrKaue](https://github.com/iMrKaue)
 
 **Orientador:**
 
