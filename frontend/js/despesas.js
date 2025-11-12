@@ -38,25 +38,17 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   try {
-    // Captura a data informada no input
+    // Captura a data como string pura, sem usar new Date()
     const dataInput = document.getElementById("data").value;
-
-    // Cria um objeto Date e adiciona 3 horas para corrigir o fuso UTC-3
-    const dataCorrigida = new Date(dataInput);
-    dataCorrigida.setHours(dataCorrigida.getHours() + 3);
-
-    // Formata novamente para yyyy-mm-dd antes de enviar
-    const dataFormatada = dataCorrigida.toISOString().split("T")[0];
 
     // Cria o objeto da nova despesa
     const nova = {
       descricao: document.getElementById("descricao").value,
       categoria: document.getElementById("categoria").value,
       valor: parseFloat(document.getElementById("valor").value),
-      data_despesa: dataFormatada,
+      data_despesa: dataInput // <-- envia a string exata
     };
 
-    // Envia para a API
     await apiFetch("/api/despesas", {
       method: "POST",
       body: JSON.stringify(nova)
@@ -70,6 +62,7 @@ form.addEventListener("submit", async (e) => {
     showError("Erro ao registrar despesa: " + (error.message || "Erro desconhecido"));
   }
 });
+
 
 // ===============================
 // 🔹 Excluir despesa

@@ -40,21 +40,13 @@ exports.criar = (req, res) => {
     const usuario_id = decoded.id;
     const { descricao, categoria, valor, data_despesa } = req.body;
 
-    // ✅ Corrige o fuso horário sem alterar o dia selecionado
-    let dataCorrigida = data_despesa;
-    if (dataCorrigida) {
-      const data = new Date(dataCorrigida);
-      dataCorrigida = new Date(data.getTime() - data.getTimezoneOffset() * 60000)
-        .toISOString()
-        .split("T")[0];
-    }
-    
+    // ✅ NÃO usar new Date() nem ajustar fuso — salva o valor direto
     const sql = `
       INSERT INTO despesas (descricao, categoria, valor, data_despesa, usuario_id)
       VALUES (?, ?, ?, ?, ?)
     `;
-    db.query(sql, [descricao, categoria, valor, dataCorrigida, usuario_id], (err, result) => {
-    
+
+    db.query(sql, [descricao, categoria, valor, data_despesa, usuario_id], (err) => {
       if (err) {
         console.error('Erro ao criar despesa:', err);
         return res.status(500).json({ message: err.sqlMessage || 'Erro ao criar despesa' });
@@ -66,7 +58,6 @@ exports.criar = (req, res) => {
     res.status(401).json({ message: "Token inválido" });
   }
 };
-
 
 exports.atualizar = (req, res) => {
   const { id } = req.params;
