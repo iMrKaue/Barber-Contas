@@ -350,7 +350,7 @@ Integrantes:
 
 **Orientador:**
 
-- Prof. [Nome do Orientador] — Faculdade [Nome da Instituição]
+- Prof. Daniel Ferreira De Barros Jr — Faculdade Uninove
 
 **Grupo:**
 
