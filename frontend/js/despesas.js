@@ -1,11 +1,13 @@
 // frontend/js/despesas.js
 console.log("💸 Script despesas.js carregado!");
 
-
+// Referências dos elementos da página
 const form = document.getElementById("formDespesa");
 const tabela = document.querySelector("#tabelaDespesas tbody");
 
-// Carregar lista de despesas
+// ===============================
+// 🔹 Carregar lista de despesas
+// ===============================
 async function carregarDespesas() {
   try {
     const despesas = await apiFetch("/api/despesas");
@@ -29,17 +31,32 @@ async function carregarDespesas() {
   }
 }
 
+// =====================================
+// 🔹 Adicionar nova despesa (corrigido)
+// =====================================
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   try {
+    // Captura a data informada no input
+    const dataInput = document.getElementById("data").value;
+
+    // Cria um objeto Date e adiciona 3 horas para corrigir o fuso UTC-3
+    const dataCorrigida = new Date(dataInput);
+    dataCorrigida.setHours(dataCorrigida.getHours() + 3);
+
+    // Formata novamente para yyyy-mm-dd antes de enviar
+    const dataFormatada = dataCorrigida.toISOString().split("T")[0];
+
+    // Cria o objeto da nova despesa
     const nova = {
       descricao: document.getElementById("descricao").value,
       categoria: document.getElementById("categoria").value,
       valor: parseFloat(document.getElementById("valor").value),
-      data_despesa: document.getElementById("data").value,
+      data_despesa: dataFormatada,
     };
 
+    // Envia para a API
     await apiFetch("/api/despesas", {
       method: "POST",
       body: JSON.stringify(nova)
@@ -54,7 +71,9 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// Excluir despesa
+// ===============================
+// 🔹 Excluir despesa
+// ===============================
 async function excluirDespesa(id) {
   if (confirm("Deseja realmente excluir esta despesa?")) {
     try {
@@ -68,5 +87,7 @@ async function excluirDespesa(id) {
   }
 }
 
-// Inicializar
+// ===============================
+// 🔹 Inicializar ao carregar
+// ===============================
 carregarDespesas();
