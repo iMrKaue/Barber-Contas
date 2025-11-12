@@ -6,7 +6,7 @@ const form = document.getElementById("formDespesa");
 const tabela = document.querySelector("#tabelaDespesas tbody");
 
 // ===============================
-// 🔹 Carregar lista de despesas
+// 🔹 Carregar lista de despesas (corrigido)
 // ===============================
 async function carregarDespesas() {
   try {
@@ -14,13 +14,22 @@ async function carregarDespesas() {
 
     tabela.innerHTML = "";
     despesas.forEach((d) => {
+      // ✅ Usa a string original vinda do banco
+      let dataFormatada = d.data_despesa;
+
+      // Caso venha no formato YYYY-MM-DD, transforma para DD/MM/YYYY manualmente
+      if (dataFormatada && dataFormatada.includes("-")) {
+        const partes = dataFormatada.split("-");
+        dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+
       const linha = document.createElement("tr");
       linha.innerHTML = `
         <td>${d.id}</td>
         <td>${d.descricao}</td>
         <td>${d.categoria}</td>
         <td>R$ ${parseFloat(d.valor).toFixed(2)}</td>
-        <td>${new Date(d.data_despesa).toLocaleDateString()}</td>
+        <td>${dataFormatada}</td>
         <td><button onclick="excluirDespesa(${d.id})">🗑️ Excluir</button></td>
       `;
       tabela.appendChild(linha);

@@ -2,6 +2,9 @@ const jwt = require("jsonwebtoken");
 const db = require('../config/db');
 const Despesa = require('../models/despesaModel');
 
+// ======================================
+// 🔹 LISTAR TODAS AS DESPESAS
+// ======================================
 exports.listar = (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Token ausente" });
@@ -21,6 +24,9 @@ exports.listar = (req, res) => {
   }
 };
 
+// ======================================
+// 🔹 BUSCAR DESPESA POR ID
+// ======================================
 exports.buscar = (req, res) => {
   const { id } = req.params;
   Despesa.buscarPorId(id, (err, results) => {
@@ -31,6 +37,9 @@ exports.buscar = (req, res) => {
   });
 };
 
+// ======================================
+// 🔹 CRIAR DESPESA (FORÇANDO DATA)
+// ======================================
 exports.criar = (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Token ausente" });
@@ -40,18 +49,18 @@ exports.criar = (req, res) => {
     const usuario_id = decoded.id;
     const { descricao, categoria, valor, data_despesa } = req.body;
 
-    // ✅ NÃO usar new Date() nem ajustar fuso — salva o valor direto
+    // ✅ Usa STR_TO_DATE para forçar gravação literal da data
     const sql = `
       INSERT INTO despesas (descricao, categoria, valor, data_despesa, usuario_id)
-      VALUES (?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, STR_TO_DATE(?, '%Y-%m-%d'), ?)
     `;
 
     db.query(sql, [descricao, categoria, valor, data_despesa, usuario_id], (err) => {
       if (err) {
-        console.error('Erro ao criar despesa:', err);
+        console.error('❌ Erro ao criar despesa:', err);
         return res.status(500).json({ message: err.sqlMessage || 'Erro ao criar despesa' });
       }
-      res.status(201).json({ message: 'Despesa adicionada com sucesso!' });
+      res.status(201).json({ message: '✅ Despesa adicionada com sucesso!' });
     });
   } catch (error) {
     console.error('Erro ao verificar token:', error);
@@ -59,6 +68,9 @@ exports.criar = (req, res) => {
   }
 };
 
+// ======================================
+// 🔹 ATUALIZAR DESPESA
+// ======================================
 exports.atualizar = (req, res) => {
   const { id } = req.params;
   Despesa.atualizar(id, req.body, (err) => {
@@ -67,6 +79,9 @@ exports.atualizar = (req, res) => {
   });
 };
 
+// ======================================
+// 🔹 EXCLUIR DESPESA
+// ======================================
 exports.excluir = (req, res) => {
   const { id } = req.params;
   Despesa.excluir(id, (err) => {
