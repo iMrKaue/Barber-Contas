@@ -335,12 +335,18 @@ Frontend pode ser hospedado via **Vercel** (opcional):
 
 ## 👨‍💻 Autor e Créditos
 
-**Desenvolvido por:**
+👥 Equipe de Desenvolvimento
 
-- **Kauê Ferreira**
-- Estudante de Análise e Desenvolvimento de Sistemas
-- 📧 Email: kaueferreira2020@hotmail.com
-- 🐙 GitHub: [@iMrKaue](https://github.com/iMrKaue)
+O projeto foi desenvolvido em equipe como parte da disciplina de Desenvolvimento de Sistemas, com colaboração ativa em todas as etapas — análise, design, codificação, testes e documentação.
+
+Líder:
+- Kauê Ferreira Macedo - RA - 924108818
+
+Integrantes:
+- João Vitor dos Santos                    RA - 924106044
+- Marcos Vinicius Ferreira da Silva        RA - 924102932
+- Diogo Expedito da Silva Oliveira         RA - 924106931
+- Pietro Edaurdo Batista Aranha do Amaral  RA - 924111320
 
 **Orientador:**
 
