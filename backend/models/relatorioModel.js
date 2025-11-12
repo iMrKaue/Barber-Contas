@@ -48,6 +48,7 @@ const Relatorio = {
     db.query(sql, [usuario_id], callback);
   },
 
+  // ✅ Corrigido: exibe todas as vendas (sem limite de dias) e em ordem cronológica
   vendasPorPeriodo: (usuario_id, dias, callback) => {
     const sql = `
       SELECT 
@@ -56,12 +57,11 @@ const Relatorio = {
         COALESCE(SUM(v.comissao), 0) AS total_comissoes,
         COUNT(*) AS quantidade_vendas
       FROM vendas v
-      WHERE v.usuario_id = ? 
-        AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+      WHERE v.usuario_id = ?
       GROUP BY DATE(v.data_venda)
-      ORDER BY data ASC
+      ORDER BY DATE(v.data_venda) ASC
     `;
-    db.query(sql, [usuario_id, dias], callback);
+    db.query(sql, [usuario_id], callback);
   },
 
   despesasPorCategoria: (usuario_id, callback) => {
@@ -115,7 +115,6 @@ const Relatorio = {
     console.log("📊 Consulta SQL de relatório mensal executada para usuário:", usuario_id);
     db.query(sql, [usuario_id, usuario_id, usuario_id], callback);
   }
-  
 };
 
 module.exports = Relatorio;
