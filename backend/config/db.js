@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mysql = require('mysql2');
 
+// 🧠 Criação da conexão MySQL com timezone fixo e tratamento de datas
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -8,7 +9,9 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
   ssl: { rejectUnauthorized: false },
-  charset: 'utf8mb4'
+  charset: 'utf8mb4',
+  timezone: '-03:00',   // ✅ Força fuso horário de Brasília
+  dateStrings: true     // ✅ Retorna as datas como strings (sem conversão automática)
 });
 
 connection.connect((err) => {
@@ -16,18 +19,25 @@ connection.connect((err) => {
     console.error('❌ Erro ao conectar ao MySQL:', err.sqlMessage);
   } else {
     console.log('✅ Conectado ao MySQL (Railway)');
-    // Define o charset da conexão para UTF-8
+    
+    // Define charset UTF-8
     connection.query('SET NAMES utf8mb4', (err) => {
       if (err) console.error('❌ Erro ao definir charset:', err.sqlMessage);
       else console.log('✅ Charset UTF-8 definido');
     });
+
+    // ✅ Força timezone da sessão para UTC-3
+    connection.query("SET time_zone = '-03:00';", (err) => {
+      if (err) console.error('⚠️ Erro ao definir timezone da sessão:', err.sqlMessage);
+      else console.log('🕒 Timezone ajustado para UTC-3 (Brasília)');
+    });
+
     criarTabelasComUsuarioId();
   }
 });
 
 // 🧩 Cria todas as tabelas com usuario_id
 function criarTabelasComUsuarioId() {
-  // Primeiro cria a tabela de usuários (precisa existir primeiro para as FKs)
   const sqlUsuarios = `
     CREATE TABLE IF NOT EXISTS usuarios (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -55,7 +65,6 @@ function adicionarColunaUsuarioId() {
   let completas = 0;
 
   tabelas.forEach((tabela) => {
-    // Verifica se a coluna já existe
     const checkColumn = `
       SELECT COUNT(*) as existe 
       FROM INFORMATION_SCHEMA.COLUMNS 
@@ -73,7 +82,6 @@ function adicionarColunaUsuarioId() {
         const existe = results[0].existe > 0;
         
         if (!existe) {
-          // Primeiro adiciona a coluna (sem constraint)
           const addColumn = `ALTER TABLE ${tabela} ADD COLUMN usuario_id INT`;
           
           connection.query(addColumn, (err2) => {
@@ -84,7 +92,6 @@ function adicionarColunaUsuarioId() {
             } else {
               console.log(`✅ Coluna usuario_id adicionada em ${tabela}`);
               
-              // Depois adiciona a foreign key
               const fkName = `fk_${tabela}_usuario_id`;
               const addFK = `
                 ALTER TABLE ${tabela} 
@@ -94,7 +101,6 @@ function adicionarColunaUsuarioId() {
               
               connection.query(addFK, (err3) => {
                 if (err3) {
-                  // Se a FK já existe ou há erro, apenas loga (não é crítico)
                   console.log(`⚠️ Aviso ao adicionar FK em ${tabela}:`, err3.sqlMessage);
                 } else {
                   console.log(`✅ Foreign key adicionada em ${tabela}`);
@@ -114,7 +120,7 @@ function adicionarColunaUsuarioId() {
   });
 }
 
-// 🧩 Cria as tabelas atualizadas com usuario_id (se não existirem)
+// 🧱 Cria as tabelas atualizadas com usuario_id
 function criarTabelasAtualizadas() {
   const barbeiros = `
     CREATE TABLE IF NOT EXISTS barbeiros (
@@ -186,6 +192,5 @@ function criarTabelasAtualizadas() {
     });
   });
 }
-
 
 module.exports = connection;
