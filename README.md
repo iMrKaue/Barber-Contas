@@ -5,7 +5,7 @@
 
 Link do Site - https://barber-contas.vercel.app/
 
-Link do Vídeo -
+Link do Vídeo - https://youtu.be/LGwUt50Xrys
 
 ---
 
