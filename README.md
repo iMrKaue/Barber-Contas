@@ -357,7 +357,7 @@ Integrantes:
 
 **Orientador:**
 
-- Prof. Daniel Ferreira De Barros Jr — Faculdade Uninove
+- Prof. Daniel Ferreira De Barros Jr — Faculdade Universidade Nove de Julho 
 
 **Grupo:**
 
