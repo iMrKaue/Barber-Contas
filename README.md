@@ -3,6 +3,10 @@
 > Projeto desenvolvido como trabalho acadêmico na disciplina de Desenvolvimento de Sistemas.  
 > Sistema **profissional de gestão financeira e operacional para barbearias**, com recursos modernos de controle de vendas, despesas, relatórios visuais e exportação de dados.
 
+Link do Site - https://barber-contas.vercel.app/
+
+Link do Vídeo - https://youtu.be/LGwUt50Xrys
+
 ---
 
 ## 🧭 Sumário
@@ -347,10 +351,13 @@ Integrantes:
 - Marcos Vinicius Ferreira da Silva        RA - 924102932
 - Diogo Expedito da Silva Oliveira         RA - 924106931
 - Pietro Edaurdo Batista Aranha do Amaral  RA - 924111320
+- Fabiano dos Santos Carvalho              RA - 924110969
+- Kauan Lisboa da Silva                    RA - 924112062
+- Gilverson Matuchaki Sousa                RA - 924105480
 
 **Orientador:**
 
-- Prof. Daniel Ferreira De Barros Jr — Faculdade Uninove
+- Prof. Daniel Ferreira De Barros Jr — Faculdade Universidade Nove de Julho 
 
 **Grupo:**
 
