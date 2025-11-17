@@ -78,8 +78,8 @@ exports.login = (req, res) => {
       const token = jwt.sign(
         { id: usuario.id, nome: usuario.nome, nivel: usuario.nivel },
         JWT_SECRET,
-        { expiresIn: '8h' }
-      );
+        { expiresIn: "365d" }
+      );      
   
       res.json({ message: 'Login bem-sucedido', token });
     });

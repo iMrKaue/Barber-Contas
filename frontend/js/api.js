@@ -3,48 +3,50 @@ const API_BASE = window.location.hostname.includes("localhost")
   ? "http://localhost:3000"
   : "https://barber-contas.onrender.com";
 
-function apiFetch(endpoint, options = {}) {
-  const token = localStorage.getItem("token");
-  const headers = {
-    "Content-Type": "application/json",
-    ...(token && { "Authorization": `Bearer ${token}` }),
-    ...options.headers
-  };
-
-  return fetch(`${API_BASE}${endpoint}`, { ...options, headers })
-    .then(async (res) => {
-      if (!res.ok) {
-        let errorData;
-        const contentType = res.headers.get("content-type");
-        
-        if (contentType && contentType.includes("application/json")) {
-          try {
-            errorData = await res.json();
-          } catch (e) {
-            errorData = { message: `Erro ${res.status}: ${res.statusText}` };
-          }
-        } else {
-          try {
-            const text = await res.text();
-            errorData = { message: text || `Erro ${res.status}: ${res.statusText}` };
-          } catch (e) {
-            errorData = { message: `Erro ${res.status}: ${res.statusText}` };
-          }
+  function apiFetch(endpoint, options = {}) {
+    const token = localStorage.getItem("token");
+  
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers
+    };
+  
+    return fetch(`${API_BASE}${endpoint}`, { ...options, headers })
+      .then(async (res) => {
+        // Se a API caiu/dormiu e começou a responder 500/502
+        if (res.status === 502 || res.status === 503 || res.status === 504) {
+          console.warn("Servidor acordando... tentando novamente em 2s...");
+          await new Promise(r => setTimeout(r, 2000));
+          return apiFetch(endpoint, options); // tenta de novo
         }
-        
-        const errorMessage = errorData.message || errorData.error || `Erro ${res.status}: ${res.statusText}`;
-        console.error(`Erro na API [${res.status}]:`, errorMessage, errorData);
-        throw new Error(errorMessage);
-      }
-      return res.json();
-    })
-    .catch(error => {
-      // Se for um erro de rede, fornecer mensagem mais amigável
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        console.error('Erro de conexão com a API:', error);
-        throw new Error('Não foi possível conectar ao servidor. Verifique sua conexão.');
-      }
-      console.error('Erro na API:', error);
-      throw error;
-    });
-}
+  
+        // ⚠️ Se token expirou
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+  
+          // Mensagem de sessão expirada
+          alert("Sua sessão expirou. Faça login novamente."); 
+  
+          // Redireciona para o login
+          window.location.href = "/login.html";
+          return;
+        }
+  
+        if (!res.ok) {
+          let errorText = await res.text();
+          throw new Error(errorText || `Erro ${res.status}`);
+        }
+  
+        // Se backend acordou agora e respondeu devagar
+        return res.json();
+      })
+      .catch(error => {
+        if (error.message.includes("Failed to fetch")) {
+          console.error("Erro de conexão: backend offline ou dormindo.");
+          alert("Falha ao conectar ao servidor. Tente novamente em alguns segundos.");
+        }
+        throw error;
+      });
+  }
+  
